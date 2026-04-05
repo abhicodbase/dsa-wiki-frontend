@@ -1,17 +1,34 @@
 .footer {
-    border-top: 1px solid var(--border);
-    margin-top: 80px;
-    padding: 32px 0;
-    text-align: center;
-    color: var(--text-muted);
-    font-size: 0.875rem;
+    padding: 40px 32px 60px;
+    background: var(--paper);
 }
 
-.footer a {
-    color: var(--accent-neon);
-    transition: opacity 0.2s;
+.footerLine {
+    height: 1px;
+    background: var(--rule);
+    margin-bottom: 20px;
 }
 
-.footer a:hover {
-    opacity: 0.8;
+.footerContent {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    color: var(--ink3);
+    font-family: var(--body);
+}
+
+.footerLinks {
+    display: flex;
+    gap: 16px;
+}
+
+.footerLinks a {
+    color: var(--ink3);
+    text-decoration: none;
+    transition: color 0.15s;
+}
+
+.footerLinks a:hover {
+    color: var(--red);
 }

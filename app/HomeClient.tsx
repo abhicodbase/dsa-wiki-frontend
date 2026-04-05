@@ -1,90 +1,127 @@
 "use client";
 
 import { useState } from "react";
-import { Problem, Category } from "@/lib/github";
+import { Problem } from "@/lib/github";
 import ProblemCard from "@/components/ProblemCard";
 import styles from "./Home.module.css";
 
-const ALL_CATEGORIES: ("All" | Category)[] = [
-    "All",
-    "Array",
-    "String",
-    "Graphs",
-    "DP",
-    "LinkedList",
-];
-
 export default function HomeClient({ initialProblems }: { initialProblems: Problem[] }) {
-    const [activeFilter, setActiveFilter] = useState<"All" | Category>("All");
+    const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
 
-    const filtered =
-        activeFilter === "All"
-            ? initialProblems
-            : initialProblems.filter((p) => p.categories.includes(activeFilter as Category));
+    const toggleDiff = (diff: string) => {
+        const next = new Set(hiddenDiffs);
+        if (next.has(diff)) next.delete(diff);
+        else next.add(diff);
+        setHiddenDiffs(next);
+    };
+
+    const filtered = initialProblems.filter(p => !hiddenDiffs.has(p.difficulty));
 
     return (
-        <div className="container">
+        <div className="container" style={{ paddingBottom: '60px' }}>
+            {/* HERO SECTION */}
             <section className={styles.hero}>
-                <div className={styles.heroBadge}>
-                    <div className={styles.badgeDot}></div>
-                    Live from GitHub · C++ solutions
-                </div>
-                <h1 className={styles.heroTitle}>Master data structures & algorithms</h1>
-                <p className={styles.heroSub}>
-                    A curated problem set fetched directly from{" "}
-                    <a
-                        className={styles.heroLink}
-                        href="https://github.com/abhicodbase/dsa-wiki"
-                        target="_blank"
-                        rel="noopener noreferrer"
-                    >
-                        github.com/abhicodbase/dsa-wiki
-                    </a>
-                    . Work through problems, explore solutions, build intuition.
-                </p>
-
-                <div className={styles.statsRow}>
-                    <div className={styles.statCard}>
-                        <div className={styles.statNum}>{initialProblems.length}</div>
-                        <div className={styles.statLabel}>Problems</div>
+                <div className={styles.heroColumns}>
+                    <div className={styles.heroLeft}>
+                        <span className={styles.kicker}>✦ Live from GitHub</span>
+                        <h1 className={styles.heroHeadline}>Master <em>Data Structures</em> & Algorithms, One Problem at a Time</h1>
+                        <p className={styles.heroDeck}>
+                            A curated practice journal fetching C++ solutions directly from{" "}
+                            <a href="https://github.com/abhicodbase/dsa-wiki" target="_blank" rel="noopener noreferrer">
+                                github.com/abhicodbase/dsa-wiki
+                            </a>.
+                            Click any problem to read, study, and get an AI-powered explanation.
+                        </p>
                     </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statNum}>C++</div>
-                        <div className={styles.statLabel}>Language</div>
-                    </div>
-                    <div className={styles.statCard}>
-                        <div className={styles.statNum}>0%</div>
-                        <div className={styles.statLabel}>Solved</div>
+                    <div className={styles.colDivider}></div>
+                    <div className={styles.heroRight}>
+                        <div className={styles.statGrid}>
+                            <div className={styles.statCell}>
+                                <div className={styles.statCellVal}>{initialProblems.length}</div>
+                                <div className={styles.statCellLbl}>Problems</div>
+                            </div>
+                            <div className={styles.statCell}>
+                                <div className={styles.statCellVal}>0</div>
+                                <div className={styles.statCellLbl}>Solved</div>
+                            </div>
+                            <div className={styles.statCell}>
+                                <div className={styles.statCellVal}>0</div>
+                                <div className={styles.statCellLbl}>In Progress</div>
+                            </div>
+                            <div className={styles.statCell}>
+                                <div className={styles.statCellVal}>C++</div>
+                                <div className={styles.statCellLbl}>Language</div>
+                            </div>
+                        </div>
+                        <div className={styles.progressSection}>
+                            <div className={styles.progressLabelRow}>
+                                <span>Progress</span>
+                                <span>0 of {initialProblems.length}</span>
+                            </div>
+                            <div className={styles.progressTrack}>
+                                <div className={styles.progressFill} style={{ width: '0%' }}></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </section>
 
-            <div className={styles.sectionLabel}>Filter by topic</div>
-            <div className={styles.filters}>
-                {ALL_CATEGORIES.map((cat) => (
+            {/* FILTER BAR */}
+            <div className={styles.filterBar}>
+                <span className={styles.filterLabel}>Difficulty</span>
+                <div className={styles.diffTags}>
                     <button
-                        key={cat}
-                        className={`${styles.filterPill} ${activeFilter === cat ? styles.filterPillActive : ""}`}
-                        onClick={() => setActiveFilter(cat as typeof activeFilter)}
+                        className={`${styles.dtag} ${styles.easy} ${hiddenDiffs.has('Easy') ? styles.off : ''}`}
+                        onClick={() => toggleDiff('Easy')}
                     >
-                        {cat === "All" ? "All" : cat}
+                        Easy
                     </button>
-                ))}
+                    <button
+                        className={`${styles.dtag} ${styles.medium} ${hiddenDiffs.has('Medium') ? styles.off : ''}`}
+                        onClick={() => toggleDiff('Medium')}
+                    >
+                        Medium
+                    </button>
+                    <button
+                        className={`${styles.dtag} ${styles.hard} ${hiddenDiffs.has('Hard') ? styles.off : ''}`}
+                        onClick={() => toggleDiff('Hard')}
+                    >
+                        Hard
+                    </button>
+                </div>
             </div>
 
-            <div className={styles.problemsList}>
-                {filtered.length === 0 ? (
-                    <div className={styles.emptyState}>No problems found.</div>
-                ) : (
-                    filtered.map((problem, i) => (
-                        <ProblemCard key={problem.slug} problem={problem} index={i} />
-                    ))
-                )}
-
-                {/* Placeholder row from HTML */}
-                <div className={styles.placeholderRow}>
-                    {/* We can skip this or add as a decorative element if needed */}
+            {/* PROBLEMS TABLE */}
+            <div className={styles.problemsSection}>
+                <div className={styles.sectionRule}>
+                    <div className={styles.sectionRuleLine}></div>
+                    <div className={styles.sectionRuleLabel}>Today&apos;s Problems</div>
+                    <div className={styles.sectionRuleLine}></div>
                 </div>
+                <table className={styles.probTable}>
+                    <thead>
+                        <tr>
+                            <th style={{ width: '36px' }}>#</th>
+                            <th></th>
+                            <th>Title</th>
+                            <th style={{ textAlign: 'right' }}>Difficulty</th>
+                            <th style={{ width: '20px' }}></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {filtered.length === 0 ? (
+                            <tr>
+                                <td colSpan={5} style={{ padding: '24px 0', color: 'var(--ink3)', fontStyle: 'italic', fontSize: '13px' }}>
+                                    No problems match the current filter.
+                                </td>
+                            </tr>
+                        ) : (
+                            filtered.map((problem, i) => (
+                                <ProblemCard key={problem.slug} problem={problem} index={i} />
+                            ))
+                        )}
+                    </tbody>
+                </table>
             </div>
         </div>
     );

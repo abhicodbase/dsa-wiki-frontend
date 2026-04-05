@@ -1,69 +1,96 @@
-.nav {
+.masthead {
+    border-bottom: 3px double var(--rule);
+    padding: 0 32px;
+    background: var(--paper);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.mastheadTop {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 14px 28px;
-    background: var(--bg-primary);
-    border-bottom: 0.5px solid var(--border-light);
-    position: sticky;
-    top: 0;
-    z-index: 10;
+    padding: 10px 0 6px;
+    border-bottom: 0.5px solid var(--rule-light);
+    font-size: 11px;
+    color: var(--ink3);
+    font-family: var(--body);
 }
 
-.navLogo {
-    display: flex;
-    align-items: center;
-    gap: 9px;
-    font-size: 15px;
-    font-weight: 500;
-    color: var(--text-primary);
+.mastheadTop a {
+    color: var(--ink3);
+    text-decoration: none;
 }
 
-.logoIcon {
-    width: 30px;
-    height: 30px;
-    border-radius: 7px;
-    background: var(--info-bg);
-    color: var(--info-text);
+.mastheadTop a:hover {
+    color: var(--red);
+}
+
+.mastheadMain {
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
+    padding: 8px 0 10px;
+}
+
+.nameplate {
+    font-family: var(--fraktur);
+    font-size: 38px;
+    color: var(--ink);
+    letter-spacing: 0.01em;
+    line-height: 1;
+    user-select: none;
+}
+
+.mastheadRight {
+    text-align: right;
+}
+
+.editionLine {
+    font-size: 11px;
+    color: var(--ink3);
+    font-family: var(--body);
+}
+
+.editionNum {
     font-size: 13px;
-    font-weight: 600;
+    font-weight: 700;
+    color: var(--ink);
+    font-family: var(--serif);
 }
 
-.navRight {
+.navStrip {
     display: flex;
-    align-items: center;
-    gap: 6px;
+    gap: 0;
+    border-top: 1px solid var(--rule);
+    margin: 0 -32px;
+    padding: 0 32px;
 }
 
-.navLink {
-    font-size: 13px;
-    color: var(--text-secondary);
-    padding: 6px 10px;
-    border-radius: var(--radius-md);
-    transition: background 0.15s;
+.navItem {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink2);
+    padding: 6px 14px 6px 0;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-family: var(--body);
+    transition: color 0.15s;
 }
 
-.navLink:hover {
-    background: var(--bg-secondary);
-    color: var(--text-primary);
+.navItem:first-child {
+    padding-left: 0;
 }
 
-.githubBtn {
-    font-size: 13px;
-    color: var(--text-primary);
-    padding: 6px 14px;
-    border: 0.5px solid var(--border-medium);
-    border-radius: var(--radius-md);
-    background: var(--bg-primary);
-    transition: background 0.15s;
-    display: flex;
-    align-items: center;
-    gap: 6px;
+.navItem:hover,
+.navItemActive {
+    color: var(--red);
 }
 
-.githubBtn:hover {
-    background: var(--bg-secondary);
+.navItemActive {
+    color: var(--red);
 }

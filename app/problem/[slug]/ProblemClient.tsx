@@ -1,130 +1,126 @@
 "use client";
 
 import { useState } from "react";
-import Link from "next/link";
-import Image from "next/image";
-import { ExternalLink, ChevronRight, Clock, Database } from "lucide-react";
 import { Problem } from "@/lib/github";
 import CodeViewer from "@/components/CodeViewer";
 import ReactMarkdown from "react-markdown";
 import styles from "./Problem.module.css";
 
 export default function ProblemClient({ problem }: { problem: Problem }) {
+    const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
     const approach = problem.approaches[activeApproach];
 
-    const diffClass =
-        problem.difficulty === "Easy"
-            ? "badge-easy"
-            : problem.difficulty === "Medium"
-                ? "badge-medium"
-                : "badge-hard";
+    const diffClass = problem.difficulty.toLowerCase();
 
     return (
         <div className={styles.page}>
-            <div className="container">
-                {/* Breadcrumb */}
-                <nav className={styles.breadcrumb}>
-                    <Link href="/">Problems</Link>
-                    <ChevronRight size={14} className={styles.breadcrumbSep} />
-                    <span className={styles.breadcrumbCurrent}>{problem.title}</span>
-                </nav>
-
-                {/* Header */}
-                <div className={styles.header}>
-                    <div className={styles.headerTop}>
-                        <span className={`badge ${diffClass}`}>{problem.difficulty}</span>
-                        {problem.categories.map((cat) => (
-                            <span key={cat} className="tag">
-                                {cat}
-                            </span>
-                        ))}
-                    </div>
-                    <h1 className={styles.problemTitle}>{problem.title}</h1>
-                    <div className={styles.descriptionBox}>
-                        <ReactMarkdown>{problem.description}</ReactMarkdown>
-                    </div>
+            <div className={styles.panel}>
+                <div className={styles.panelMasthead}>
+                    <span className={styles.panelSectionTag}>Problem · #{problem.slug.slice(0, 2)}</span>
+                    <h1 className={styles.panelHeadline}>{problem.title}</h1>
                 </div>
 
-                {/* Visual Concept */}
-                {problem.visualImage && (
-                    <div style={{ marginBottom: 48 }}>
-                        <p className={styles.sectionTitle}>Visual Concept</p>
-                        <div className={styles.visualContainer}>
-                            <Image
-                                src={problem.visualImage}
-                                alt="Visual Concept"
-                                fill
-                                style={{ objectFit: "contain", padding: "20px" }}
-                            />
-                        </div>
-                    </div>
-                )}
+                <div className={styles.panelTabs}>
+                    <button
+                        className={`${styles.ptab} ${activeTab === 'problem' ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab('problem')}
+                    >
+                        Problem
+                    </button>
+                    <button
+                        className={`${styles.ptab} ${activeTab === 'solution' ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab('solution')}
+                    >
+                        Solution
+                    </button>
+                    <button
+                        className={`${styles.ptab} ${activeTab === 'explain' ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab('explain')}
+                    >
+                        AI Explain
+                    </button>
+                    <button
+                        className={`${styles.ptab} ${activeTab === 'notes' ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab('notes')}
+                    >
+                        Notes
+                    </button>
+                </div>
 
-                {/* Approaches */}
-                {problem.approaches.length > 0 && (
-                    <div className={styles.approachSection}>
-                        <p className={styles.sectionTitle}>
-                            {problem.approaches.length > 1 ? "Solutions & Approaches" : "Solution Approach"}
-                        </p>
-
-                        {problem.approaches.length > 1 && (
-                            <div className={styles.tabList}>
-                                {problem.approaches.map((a, i) => (
-                                    <button
-                                        key={i}
-                                        className={`${styles.tab} ${activeApproach === i ? styles.tabActive : ""}`}
-                                        onClick={() => setActiveApproach(i)}
-                                    >
-                                        {a.name}
-                                    </button>
-                                ))}
+                <div className={styles.panelBody}>
+                    {/* PROBLEM TAB */}
+                    {activeTab === 'problem' && (
+                        <div id="tab-problem">
+                            <div className={styles.panelBadges}>
+                                <span className={`${styles.diffPill} ${styles[diffClass] || ''}`}>{problem.difficulty}</span>
+                                <span className={styles.panelComplexity}>
+                                    {problem.complexity?.time || 'O(n)'} · {problem.complexity?.space || 'O(1)'}
+                                </span>
                             </div>
-                        )}
+                            <span className={styles.colKicker}>Description</span>
+                            <div className={styles.panelBodyText}>
+                                <ReactMarkdown>{problem.description}</ReactMarkdown>
+                            </div>
+                            <hr className={styles.panelRule} />
+                            <span className={styles.colKicker}>Difficulty Context</span>
+                            <p className={styles.panelBodyText}>
+                                This problem is categorized as <strong>{problem.difficulty}</strong>.
+                                It requires understanding of <em>{problem.categories.join(', ') || 'fundamental algorithms'}</em>.
+                            </p>
+                            <div className={styles.statusRow}>
+                                <button className={styles.sbtn}>✓ Solved</button>
+                                <button className={styles.sbtn}>~ Attempted</button>
+                                <button className={styles.sbtn}>✕ Reset</button>
+                            </div>
+                        </div>
+                    )}
 
-                        <div className={styles.approachPanel}>
-                            {approach && (
-                                <>
-                                    <div className={styles.approachInfo}>
-                                        <p className={styles.approachDesc}>{approach.description}</p>
-                                        <div className={styles.complexityGrid}>
-                                            <div className={styles.complexityCard}>
-                                                <p className={styles.complexityLabel}>Time Complexity</p>
-                                                <p className={styles.complexityValue}>{approach.timeComplexity}</p>
-                                            </div>
-                                            <div className={styles.complexityCard}>
-                                                <p className={styles.complexityLabel}>Space Complexity</p>
-                                                <p className={styles.complexityValue}>{approach.spaceComplexity}</p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <CodeViewer code={approach.code} />
-                                </>
+                    {/* SOLUTION TAB */}
+                    {activeTab === 'solution' && (
+                        <div id="tab-solution">
+                            {problem.approaches.length > 1 && (
+                                <div style={{ marginBottom: '20px', display: 'flex', gap: '8px', borderBottom: '1px solid var(--rule-light)' }}>
+                                    {problem.approaches.map((a, i) => (
+                                        <button
+                                            key={i}
+                                            className={`${styles.ptab} ${activeApproach === i ? styles.ptabActive : ""}`}
+                                            onClick={() => setActiveApproach(i)}
+                                            style={{ flex: 'none', padding: '8px 16px' }}
+                                        >
+                                            {a.name || `Approach ${i + 1}`}
+                                        </button>
+                                    ))}
+                                </div>
                             )}
+                            <div className={styles.panelBodyText}>
+                                <p style={{ marginBottom: '14px' }}>{approach?.description || 'Optimal solution implementation in C++.'}</p>
+                                <CodeViewer code={approach?.code || ''} />
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
 
-                {/* Resources */}
-                {problem.resources.length > 0 && (
-                    <div className={styles.resourcesSection}>
-                        <p className={styles.sectionTitle}>External Resources</p>
-                        <div className={styles.resourceGrid}>
-                            {problem.resources.map((r) => (
-                                <a
-                                    key={r.url}
-                                    href={r.url}
-                                    target="_blank"
-                                    rel="noopener noreferrer"
-                                    className={styles.resourceLink}
-                                >
-                                    <ExternalLink size={14} />
-                                    {r.name}
-                                </a>
-                            ))}
+                    {/* EXPLAIN TAB */}
+                    {activeTab === 'explain' && (
+                        <div id="tab-explain">
+                            <div className={styles.explainLede}>
+                                <p>
+                                    <span className={styles.dropCap}>A</span>sk the editor for a plain-English walkthrough of this solution — the approach, the key insight, and why it works.
+                                </p>
+                                <button className={styles.runBtn}>Run the explainer</button>
+                            </div>
                         </div>
-                    </div>
-                )}
+                    )}
+
+                    {/* NOTES TAB */}
+                    {activeTab === 'notes' && (
+                        <div id="tab-notes">
+                            <span className={styles.colKicker} style={{ marginTop: 0 }}>Your notes</span>
+                            <textarea className={styles.notesArea} placeholder="Your approach, observations, questions..."></textarea>
+                            <button className={styles.notesSave}>Save</button>
+                        </div>
+                    )}
+                </div>
             </div>
         </div>
     );

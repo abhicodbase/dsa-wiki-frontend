@@ -47,6 +47,10 @@ export interface Problem {
   difficulty: Difficulty;
   categories: Category[];
   description: string;
+  complexity?: {
+    time: string;
+    space: string;
+  };
   approaches: Approach[];
   resources: Resource[];
   visualImage?: string;
@@ -83,6 +87,7 @@ export async function fetchProblems(): Promise<Problem[]> {
         difficulty: inferDifficulty(slug),
         categories: inferCategories(slug),
         description: "",
+        complexity: { time: "O(n)", space: "O(1)" }, // Defaults
         approaches: [],
         resources: [],
       };
@@ -131,6 +136,10 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
     difficulty: "Medium", // Could parse from README
     categories: [], // Could parse from README
     description: readmeText.split("---")[0] || "No description available.",
+    complexity: {
+      time: approaches[0]?.timeComplexity || "O(n)",
+      space: approaches[0]?.spaceComplexity || "O(1)",
+    },
     approaches,
     resources: [], // Could parse from README
     visualImage: conceptImg ? `${RAW_BASE_URL}/${slug}/concept.png` : undefined,
