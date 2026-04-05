@@ -9,7 +9,16 @@ import styles from "./Home.module.css";
 
 function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const searchParams = useSearchParams();
+    const topic = searchParams.get("topic") || "All Problems";
+    const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
     const [progress, setProgress] = useState<ProgressMap>({});
+
+    const toggleDiff = (diff: string) => {
+        const next = new Set(hiddenDiffs);
+        if (next.has(diff)) next.delete(diff);
+        else next.add(diff);
+        setHiddenDiffs(next);
+    };
 
     useEffect(() => {
         const loadProgress = () => setProgress(getProgress());
