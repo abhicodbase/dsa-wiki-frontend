@@ -11,9 +11,11 @@ interface ProblemPanelProps {
     problem: Problem | null;
     isOpen: boolean;
     onClose: () => void;
+    isLoading?: boolean;
+    error?: string | null;
 }
 
-export default function ProblemPanel({ problem, isOpen, onClose }: ProblemPanelProps) {
+export default function ProblemPanel({ problem, isOpen, onClose, error }: ProblemPanelProps) {
     const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
     const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
@@ -36,15 +38,23 @@ export default function ProblemPanel({ problem, isOpen, onClose }: ProblemPanelP
 
     if (!problem) return null;
 
-    const approach = problem.approaches[activeApproach];
-    const diffClass = problem.difficulty.toLowerCase();
+    const isSkeletal = !problem.description || (problem.approaches && problem.approaches.length === 0);
+    const approach = problem.approaches?.[activeApproach];
+    const diffClass = problem.difficulty?.toLowerCase() || 'medium';
 
     return (
         <aside className={`${styles.panel} ${isOpen ? styles.open : ''}`}>
             <div className={styles.panelMasthead}>
-                <button className={styles.panelClose} onClick={onClose}>✕</button>
-                <span className={styles.panelSectionTag}>Problem · #{problem.slug.slice(0, 2)}</span>
-                <h1 className={styles.panelHeadline}>{problem.title}</h1>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+                    <div>
+                        <span className={styles.panelSectionTag}>Problem · #{problem.slug.slice(0, 2)}</span>
+                        <h1 className={styles.panelHeadline}>{problem.title}</h1>
+                    </div>
+                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button className={styles.closeTextBtn} onClick={onClose}>CLOSE</button>
+                        <button className={styles.panelClose} onClick={onClose}>✕</button>
+                    </div>
+                </div>
             </div>
 
             <div className={styles.panelTabs}>
@@ -86,9 +96,19 @@ export default function ProblemPanel({ problem, isOpen, onClose }: ProblemPanelP
                         </div>
                         <span className={styles.colKicker}>Description</span>
                         <div className={styles.panelBodyText}>
-                            <ReactMarkdown>{problem.description}</ReactMarkdown>
+                            {error ? (
+                                <div className={styles.errorState}>
+                                    ✕ {error}
+                                </div>
+                            ) : isSkeletal ? (
+                                <div className={styles.loadingState}>
+                                    <span className={styles.spinner}></span> Consulting GitHub...
+                                </div>
+                            ) : (
+                                <ReactMarkdown>{problem.description}</ReactMarkdown>
+                            )}
                         </div>
-                        <hr className={styles.panelRule} />
+                        {!isSkeletal && <hr className={styles.panelRule} />}
                         <span className={styles.colKicker}>Difficulty Context</span>
                         <p className={styles.panelBodyText}>
                             This problem is categorized as <strong>{problem.difficulty}</strong>.
@@ -135,8 +155,16 @@ export default function ProblemPanel({ problem, isOpen, onClose }: ProblemPanelP
                             </div>
                         )}
                         <div className={styles.panelBodyText}>
-                            <p style={{ marginBottom: '14px' }}>{approach?.description || 'Optimal solution implementation in C++.'}</p>
-                            <CodeViewer code={approach?.code || ''} />
+                            {isSkeletal ? (
+                                <div className={styles.loadingState}>
+                                    <span className={styles.spinner}></span> Fetching code...
+                                </div>
+                            ) : (
+                                <>
+                                    <p style={{ marginBottom: '14px' }}>{approach?.description || 'Optimal solution implementation in C++.'}</p>
+                                    <CodeViewer code={approach?.code || ''} />
+                                </>
+                            )}
                         </div>
                     </div>
                 )}

@@ -2,7 +2,7 @@
 
 import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
-import { Problem } from "@/lib/github";
+import { Problem, fetchProblemDetails } from "@/lib/github";
 import ProblemCard from "@/components/ProblemCard";
 import ProblemPanel from "@/components/ProblemPanel";
 import { getProgress, ProgressMap } from "@/lib/progress";
@@ -15,6 +15,7 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const [progress, setProgress] = useState<ProgressMap>({});
     const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [fetchError, setFetchError] = useState<string | null>(null);
 
     useEffect(() => {
         setTopic(searchParams.get("topic") || "All Problems");
@@ -44,7 +45,28 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
     const inProgressCount = Object.values(progress).filter(s => s === 'attempted').length;
 
+    useEffect(() => {
+        if (selectedProblem && (!selectedProblem.approaches || selectedProblem.approaches.length === 0)) {
+            const loadFullDetails = async () => {
+                setFetchError(null);
+                try {
+                    const full = await fetchProblemDetails(selectedProblem.slug);
+                    if (full) {
+                        setSelectedProblem(full);
+                    } else {
+                        setFetchError("Failed to load problem details.");
+                    }
+                } catch (e) {
+                    setFetchError("Error fetching from GitHub.");
+                }
+            };
+            loadFullDetails();
+        }
+    }, [selectedProblem?.slug]);
+
     const handleSelect = (p: Problem) => {
+        // Clear previous selection logic if any, but React state handles it.
+        // We set to skeletal first, then useEffect fetches.
         setSelectedProblem(p);
         setIsPanelOpen(true);
     };
@@ -52,7 +74,12 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     return (
         <div className={`${styles.app} ${isPanelOpen ? styles.panelOpen : ''}`}>
             <div className={styles.main}>
-                <div style={{ paddingBottom: '60px', margin: '0 auto', maxWidth: 'var(--col)' }}>
+                <div style={{
+                    paddingBottom: '60px',
+                    margin: isPanelOpen ? '0 32px' : '0 auto',
+                    maxWidth: isPanelOpen ? '100%' : 'var(--col)',
+                    transition: 'all 0.35s ease-in-out'
+                }}>
                     {/* HERO SECTION */}
                     <section className={styles.hero}>
                         <div className={styles.heroColumns}>
@@ -171,6 +198,7 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                 problem={selectedProblem}
                 isOpen={isPanelOpen}
                 onClose={() => setIsPanelOpen(false)}
+                error={fetchError}
             />
         </div>
     );

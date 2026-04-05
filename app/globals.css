@@ -29,6 +29,9 @@
   --danger-bg: #fee2e2;
   --danger-text: #991b1b;
 
+  --gold: #b8860b;
+  --header-height: 140px;
+
   /* Font Stacks */
   --serif: var(--font-playfair), 'Georgia', serif;
   --body: var(--font-libre), 'Georgia', serif;
@@ -36,7 +39,7 @@
   --fraktur: var(--font-unifraktur), cursive;
 
   --col: 680px;
-  --panel: 480px;
+  --panel: 50vw;
 }
 
 * {

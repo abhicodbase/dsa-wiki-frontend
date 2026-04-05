@@ -1,6 +1,6 @@
 .panel {
     position: fixed;
-    top: 0;
+    top: var(--header-height);
     right: 0;
     bottom: 0;
     width: var(--panel);
@@ -10,7 +10,7 @@
     transition: transform 0.35s ease-in-out;
     display: flex;
     flex-direction: column;
-    z-index: 200;
+    z-index: 90;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
 }
 
@@ -22,6 +22,8 @@
     border-bottom: 3px double var(--rule);
     padding: 24px 32px 18px;
     flex-shrink: 0;
+    margin-top: 2px;
+    /* Slight buffer */
 }
 
 .panelSectionTag {
@@ -43,8 +45,6 @@
 }
 
 .panelClose {
-    float: right;
-    margin: -4px -8px 0 16px;
     font-size: 20px;
     color: var(--ink3);
     cursor: pointer;
@@ -52,6 +52,25 @@
     border: none;
     line-height: 1;
     transition: color 0.15s;
+    padding: 0;
+}
+
+.closeTextBtn {
+    font-family: var(--body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ink3);
+    cursor: pointer;
+    background: transparent;
+    border: 1px solid var(--rule-light);
+    padding: 4px 10px;
+    transition: all 0.2s;
+}
+
+.closeTextBtn:hover {
+    border-color: var(--red);
+    color: var(--red);
 }
 
 .panelClose:hover {
@@ -250,4 +269,41 @@
     border: none;
     cursor: pointer;
     font-family: var(--body);
+}
+
+.loadingState {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: var(--body);
+    font-size: 14px;
+    color: var(--ink3);
+    padding: 40px 0;
+    justify-content: center;
+}
+
+.errorState {
+    color: var(--danger-text);
+    background: var(--danger-bg);
+    padding: 12px;
+    font-size: 13px;
+    font-family: var(--body);
+    border: 0.5px solid var(--danger-text);
+    text-align: center;
+    margin: 20px 0;
+}
+
+.spinner {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--rule-light);
+    border-top-color: var(--ink);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
 }

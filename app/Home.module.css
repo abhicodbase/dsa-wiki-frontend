@@ -6,11 +6,11 @@
 .main {
     flex: 1;
     min-width: 0;
-    transition: margin-right 0.35s ease;
-    padding: 0 32px;
+    transition: all 0.35s ease-in-out;
 }
 
 .panelOpen .main {
+    /* Margin-right is now handled in globals as a variable, but let's be explicit if needed */
     margin-right: var(--panel);
 }
 
