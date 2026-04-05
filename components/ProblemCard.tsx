@@ -29,7 +29,9 @@ export default function ProblemCard({ problem, index }: Props) {
       <td style={{ textAlign: 'right', whiteSpace: 'nowrap', verticalAlign: 'middle' }}>
         <span className={`${styles.diffPill} ${styles[diffClass]}`}>{problem.difficulty}</span>
       </td>
-      <td className={styles.probArrowCell}>›</td>
+      <td className={styles.probArrowCell}>
+        <button className={styles.readBtn}>READ</button>
+      </td>
     </tr>
   );
 }
