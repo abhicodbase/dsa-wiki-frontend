@@ -1,7 +1,6 @@
 .hero {
     border-bottom: 3px double var(--rule);
     padding: 28px 0 24px;
-    max-width: var(--col);
 }
 
 .heroColumns {
@@ -88,7 +87,6 @@
 
 .problemsSection {
     padding: 0 0 60px;
-    max-width: var(--col);
 }
 
 .progressSection {
@@ -121,7 +119,6 @@
     align-items: center;
     gap: 12px;
     flex-wrap: wrap;
-    max-width: var(--col);
 }
 
 .filterLabel {

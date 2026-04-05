@@ -28,7 +28,7 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const solvedCount = 0; // Placeholder for now
 
     return (
-        <div style={{ paddingBottom: '60px', paddingLeft: '32px', maxWidth: 'var(--col)' }}>
+        <div style={{ paddingBottom: '60px', margin: '0 auto', maxWidth: 'var(--col)' }}>
             {/* HERO SECTION */}
             <section className={styles.hero}>
                 <div className={styles.heroColumns}>

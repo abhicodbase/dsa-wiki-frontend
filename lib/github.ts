@@ -130,12 +130,25 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   const titleMatch = readmeText.match(/# (.*)/);
   const title = titleMatch ? titleMatch[1].replace(" - Explanation", "") : slug;
 
+  let description = readmeText.split("---")[0] || "No description available.";
+
+  // Transform relative image paths to absolute GitHub RAW URLs
+  // Matches ![alt](path.png) or <img src="path.png">
+  description = description.replace(
+    /!\[(.*?)\]\((?!http)(.*?)\)/g,
+    (match, alt, path) => `![${alt}](${RAW_BASE_URL}/${slug}/${path})`
+  );
+  description = description.replace(
+    /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
+    (match, path) => match.replace(path, `${RAW_BASE_URL}/${slug}/${path}`)
+  );
+
   return {
     slug,
     title,
     difficulty: "Medium", // Could parse from README
     categories: [], // Could parse from README
-    description: readmeText.split("---")[0] || "No description available.",
+    description,
     complexity: {
       time: approaches[0]?.timeComplexity || "O(n)",
       space: approaches[0]?.spaceComplexity || "O(1)",
