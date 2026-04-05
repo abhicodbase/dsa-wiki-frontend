@@ -132,6 +132,9 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
 
   let description = readmeText.split("---")[0] || "No description available.";
 
+  // Strip LaTeX-style $ symbols
+  description = description.replace(/\$/g, "");
+
   // Transform relative image paths to absolute GitHub RAW URLs
   // Matches ![alt](path.png) or <img src="path.png">
   description = description.replace(

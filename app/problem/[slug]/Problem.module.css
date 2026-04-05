@@ -12,6 +12,18 @@
     border-right: 3px double var(--rule);
     display: flex;
     flex-direction: column;
+    overflow-x: hidden;
+}
+
+.panelBodyText img {
+    max-width: 100%;
+    height: auto;
+    margin: 16px auto;
+    display: block;
+    border: 1px solid var(--rule-light);
+    padding: 6px;
+    background: var(--paper2);
+    box-sizing: border-box;
 }
 
 .panelMasthead {
@@ -221,4 +233,14 @@
 
 .notesSave:hover {
     color: var(--red);
+}
+
+.panelBodyText img {
+    max-width: 100%;
+    height: auto;
+    margin: 16px auto;
+    display: block;
+    border: 1px solid var(--rule-light);
+    padding: 6px;
+    background: var(--paper2);
 }

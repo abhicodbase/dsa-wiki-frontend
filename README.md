@@ -1,6 +1,33 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# The Algorithm Times — DSA Wiki Frontend
+
+The official study portal for exploring and practicing DSA problems directly from GitHub.
+
+### ✦ [Go to the Portal](https://dsa-wiki-frontend.vercel.app)
+
+---
+
+## Features
+- **Daily Edition Styling**: A unique newspaper-grade UI for a distraction-free learning experience.
+- **Dynamic Content**: Fetches problems, solutions, and diagrams directly from the repository.
+- **AI-Powered Explainer**: Get plain-English walkthroughs for any algorithm.
+- **Interactive Notes**: Save your observations as you solve.
 
 ## Getting Started
+
+1. **Clone the repository**:
+   ```bash
+   git clone https://github.com/abhicodbase/dsa-wiki-frontend.git
+   ```
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Run the dev server**:
+   ```bash
+   npm run dev
+   ```
+
+Open [http://localhost:3000](http://localhost:3000) to see the result.
 
 First, run the development server:
 
