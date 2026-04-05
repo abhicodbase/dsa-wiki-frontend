@@ -16,7 +16,7 @@ export default function ProblemCard({ problem, index }: Props) {
 
   return (
     <tr className={styles.probRow} onClick={() => router.push(`/problem/${problem.slug}`)}>
-      <td className={styles.probNumCell}>#{String(index + 1).padStart(2, "0")}</td>
+      <td className={styles.probNumCell}>{String(index + 1).padStart(2, "0")}</td>
       <td style={{ paddingRight: 0, width: '24px', verticalAlign: 'middle' }}>
         <span className={styles.checkCircle}></span>
       </td>

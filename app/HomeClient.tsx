@@ -1,11 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useState, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Problem } from "@/lib/github";
 import ProblemCard from "@/components/ProblemCard";
 import styles from "./Home.module.css";
 
-export default function HomeClient({ initialProblems }: { initialProblems: Problem[] }) {
+function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
+    const searchParams = useSearchParams();
+    const topic = searchParams.get("topic") || "All Problems";
     const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
 
     const toggleDiff = (diff: string) => {
@@ -15,10 +18,17 @@ export default function HomeClient({ initialProblems }: { initialProblems: Probl
         setHiddenDiffs(next);
     };
 
-    const filtered = initialProblems.filter(p => !hiddenDiffs.has(p.difficulty));
+    const filteredByTopic = topic === "All Problems"
+        ? initialProblems
+        : initialProblems.filter(p => p.categories.some(cat => cat.toLowerCase() === topic.toLowerCase()));
+
+    const filtered = filteredByTopic.filter(p => !hiddenDiffs.has(p.difficulty));
+
+    const totalProblems = initialProblems.length;
+    const solvedCount = 0; // Placeholder for now
 
     return (
-        <div className="container" style={{ paddingBottom: '60px' }}>
+        <div style={{ paddingBottom: '60px', paddingLeft: '32px', maxWidth: 'var(--col)' }}>
             {/* HERO SECTION */}
             <section className={styles.hero}>
                 <div className={styles.heroColumns}>
@@ -37,11 +47,11 @@ export default function HomeClient({ initialProblems }: { initialProblems: Probl
                     <div className={styles.heroRight}>
                         <div className={styles.statGrid}>
                             <div className={styles.statCell}>
-                                <div className={styles.statCellVal}>{initialProblems.length}</div>
+                                <div className={styles.statCellVal}>{totalProblems}</div>
                                 <div className={styles.statCellLbl}>Problems</div>
                             </div>
                             <div className={styles.statCell}>
-                                <div className={styles.statCellVal}>0</div>
+                                <div className={styles.statCellVal}>{solvedCount}</div>
                                 <div className={styles.statCellLbl}>Solved</div>
                             </div>
                             <div className={styles.statCell}>
@@ -56,10 +66,10 @@ export default function HomeClient({ initialProblems }: { initialProblems: Probl
                         <div className={styles.progressSection}>
                             <div className={styles.progressLabelRow}>
                                 <span>Progress</span>
-                                <span>0 of {initialProblems.length}</span>
+                                <span>{solvedCount} of {totalProblems}</span>
                             </div>
                             <div className={styles.progressTrack}>
-                                <div className={styles.progressFill} style={{ width: '0%' }}></div>
+                                <div className={styles.progressFill} style={{ width: `${(solvedCount / totalProblems) * 100}%` }}></div>
                             </div>
                         </div>
                     </div>
@@ -95,7 +105,7 @@ export default function HomeClient({ initialProblems }: { initialProblems: Probl
             <div className={styles.problemsSection}>
                 <div className={styles.sectionRule}>
                     <div className={styles.sectionRuleLine}></div>
-                    <div className={styles.sectionRuleLabel}>Today&apos;s Problems</div>
+                    <div className={styles.sectionRuleLabel}>{topic}</div>
                     <div className={styles.sectionRuleLine}></div>
                 </div>
                 <table className={styles.probTable}>
@@ -124,5 +134,13 @@ export default function HomeClient({ initialProblems }: { initialProblems: Probl
                 </table>
             </div>
         </div>
+    );
+}
+
+export default function HomeClient({ initialProblems }: { initialProblems: Problem[] }) {
+    return (
+        <Suspense fallback={<div>Loading...</div>}>
+            <HomeContent initialProblems={initialProblems} />
+        </Suspense>
     );
 }

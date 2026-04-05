@@ -80,6 +80,8 @@
     background: none;
     font-family: var(--body);
     transition: color 0.15s;
+    text-decoration: none;
+    display: inline-block;
 }
 
 .navItem:first-child {
@@ -89,6 +91,28 @@
 .navItem:hover,
 .navItemActive {
     color: var(--red);
+}
+
+.mascotWrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: default;
+    user-select: none;
+    transition: transform 0.2s ease;
+}
+
+.mascotWrap:hover {
+    transform: translateY(-3px) rotate(2deg);
+}
+
+.mascotName {
+    font-family: var(--body);
+    font-size: 9px;
+    font-style: italic;
+    color: var(--ink3);
+    margin-top: -2px;
+    letter-spacing: 0.06em;
 }
 
 .navItemActive {
