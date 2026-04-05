@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Problem } from "@/lib/github";
+import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
 import ReactMarkdown from "react-markdown";
 import styles from "./Problem.module.css";
@@ -9,6 +10,17 @@ import styles from "./Problem.module.css";
 export default function ProblemClient({ problem }: { problem: Problem }) {
     const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
+    const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
+
+    useEffect(() => {
+        const progress = getProgress();
+        setProblemStatus(progress[problem.slug] || 'none');
+    }, [problem.slug]);
+
+    const handleStatusChange = (status: ProblemStatus) => {
+        updateProgress(problem.slug, status);
+        setProblemStatus(status);
+    };
     const approach = problem.approaches[activeApproach];
 
     const diffClass = problem.difficulty.toLowerCase();

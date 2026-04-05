@@ -1,22 +1,22 @@
 "use client";
 
-import { useState, Suspense } from "react";
+import { useState, Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { Problem } from "@/lib/github";
 import ProblemCard from "@/components/ProblemCard";
+import { getProgress, ProgressMap } from "@/lib/progress";
 import styles from "./Home.module.css";
 
 function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const searchParams = useSearchParams();
-    const topic = searchParams.get("topic") || "All Problems";
-    const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
+    const [progress, setProgress] = useState<ProgressMap>({});
 
-    const toggleDiff = (diff: string) => {
-        const next = new Set(hiddenDiffs);
-        if (next.has(diff)) next.delete(diff);
-        else next.add(diff);
-        setHiddenDiffs(next);
-    };
+    useEffect(() => {
+        const loadProgress = () => setProgress(getProgress());
+        loadProgress();
+        window.addEventListener('progressupdate', loadProgress);
+        return () => window.removeEventListener('progressupdate', loadProgress);
+    }, []);
 
     const filteredByTopic = topic === "All Problems"
         ? initialProblems
@@ -25,7 +25,8 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const filtered = filteredByTopic.filter(p => !hiddenDiffs.has(p.difficulty));
 
     const totalProblems = initialProblems.length;
-    const solvedCount = 0; // Placeholder for now
+    const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
+    const inProgressCount = Object.values(progress).filter(s => s === 'attempted').length;
 
     return (
         <div style={{ paddingBottom: '60px', margin: '0 auto', maxWidth: 'var(--col)' }}>
