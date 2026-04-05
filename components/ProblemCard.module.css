@@ -8,6 +8,19 @@
     background: var(--paper2);
 }
 
+.probRow.active {
+    background: var(--red-bg) !important;
+}
+
+.active .probTitleLink {
+    color: var(--red) !important;
+}
+
+.active .readBtn {
+    background: var(--ink);
+    color: var(--paper);
+}
+
 .probNumCell {
     font-family: var(--mono);
     font-size: 13px;

@@ -1,3 +1,19 @@
+.app {
+    display: flex;
+    min-height: 100vh;
+}
+
+.main {
+    flex: 1;
+    min-width: 0;
+    transition: margin-right 0.35s ease;
+    padding: 0 32px;
+}
+
+.panelOpen .main {
+    margin-right: var(--panel);
+}
+
 .hero {
     border-bottom: 3px double var(--rule);
     padding: 28px 0 24px;

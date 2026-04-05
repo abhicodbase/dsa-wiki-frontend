@@ -1,6 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import styles from "./ProblemCard.module.css";
 import { Problem } from "@/lib/github";
 import { ProblemStatus } from "@/lib/progress";
@@ -9,18 +8,21 @@ interface Props {
   problem: Problem;
   index: number;
   status: ProblemStatus;
+  isSelected?: boolean;
+  onSelect: () => void;
 }
 
-export default function ProblemCard({ problem, index }: Props) {
-  const router = useRouter();
-
+export default function ProblemCard({ problem, index, status, isSelected, onSelect }: Props) {
   const diffClass = problem.difficulty.toLowerCase();
 
   return (
-    <tr className={styles.probRow} onClick={() => router.push(`/problem/${problem.slug}`)}>
+    <tr
+      className={`${styles.probRow} ${isSelected ? styles.active : ''} ${status !== 'none' ? styles[status] : ''}`}
+      onClick={onSelect}
+    >
       <td className={styles.probNumCell}>{String(index + 1).padStart(2, "0")}</td>
       <td style={{ paddingRight: 0, width: '24px', verticalAlign: 'middle' }}>
-        <span className={`${styles.checkCircle} ${styles[status]}`}>
+        <span className={`${styles.checkCircle} ${status !== 'none' ? styles[status] : ''}`}>
           {status === 'solved' && '✓'}
           {status === 'attempted' && '·'}
         </span>
