@@ -81,9 +81,24 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                                 It requires understanding of <em>{problem.categories.join(', ') || 'fundamental algorithms'}</em>.
                             </p>
                             <div className={styles.statusRow}>
-                                <button className={styles.sbtn}>✓ Solved</button>
-                                <button className={styles.sbtn}>~ Attempted</button>
-                                <button className={styles.sbtn}>✕ Reset</button>
+                                <button
+                                    className={`${styles.sbtn} ${problemStatus === 'solved' ? styles.sbtnSolved : ''}`}
+                                    onClick={() => handleStatusChange('solved')}
+                                >
+                                    ✓ Solved
+                                </button>
+                                <button
+                                    className={`${styles.sbtn} ${problemStatus === 'attempted' ? styles.sbtnAttempted : ''}`}
+                                    onClick={() => handleStatusChange('attempted')}
+                                >
+                                    - Attempted
+                                </button>
+                                <button
+                                    className={styles.sbtn}
+                                    onClick={() => handleStatusChange('none')}
+                                >
+                                    ✕ Reset
+                                </button>
                             </div>
                         </div>
                     )}

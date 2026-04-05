@@ -177,6 +177,20 @@
     background: var(--paper2);
 }
 
+.sbtnSolved {
+    background: var(--success-bg) !important;
+    color: var(--success-text) !important;
+    border-color: var(--success-text) !important;
+    opacity: 1 !important;
+}
+
+.sbtnAttempted {
+    background: var(--warning-bg) !important;
+    color: var(--warning-text) !important;
+    border-color: var(--warning-text) !important;
+    opacity: 1 !important;
+}
+
 .dropCap {
     font-family: var(--fraktur);
     font-size: 64px;
