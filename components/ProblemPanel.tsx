@@ -74,7 +74,7 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
                     className={`${styles.ptab} ${activeTab === 'explain' ? styles.ptabActive : ''}`}
                     onClick={() => setActiveTab('explain')}
                 >
-                    AI Explain
+                    Explanation
                 </button>
                 <button
                     className={`${styles.ptab} ${activeTab === 'notes' ? styles.ptabActive : ''}`}
@@ -172,11 +172,8 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
                 {/* EXPLAIN TAB */}
                 {activeTab === 'explain' && (
                     <div id="tab-explain">
-                        <div className={styles.explainLede}>
-                            <p>
-                                <span className={styles.dropCap}>A</span>sk the editor for a plain-English walkthrough of this solution — the approach, the key insight, and why it works.
-                            </p>
-                            <button className={styles.runBtn}>Run the explainer</button>
+                        <div className={styles.panelBodyText}>
+                            <ReactMarkdown>{problem.explanation || "No explanation available."}</ReactMarkdown>
                         </div>
                     </div>
                 )}

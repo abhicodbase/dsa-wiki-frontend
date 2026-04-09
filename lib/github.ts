@@ -54,6 +54,7 @@ export interface Problem {
   approaches: Approach[];
   resources: Resource[];
   visualImage?: string;
+  explanation: string;
 }
 
 async function fetchGitHub(url: string) {
@@ -90,6 +91,7 @@ export async function fetchProblems(): Promise<Problem[]> {
         complexity: { time: "O(n)", space: "O(1)" }, // Defaults
         approaches: [],
         resources: [],
+        explanation: "",
       };
     })
   );
@@ -130,21 +132,30 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   const titleMatch = readmeText.match(/# (.*)/);
   const title = titleMatch ? titleMatch[1].replace(" - Explanation", "") : slug;
 
-  let description = readmeText.split("---")[0] || "No description available.";
-
-  // Strip LaTeX-style $ symbols
-  description = description.replace(/\$/g, "");
-
   // Transform relative image paths to absolute GitHub RAW URLs
   // Matches ![alt](path.png) or <img src="path.png">
-  description = description.replace(
-    /!\[(.*?)\]\((?!http)(.*?)\)/g,
-    (match, alt, path) => `![${alt}](${RAW_BASE_URL}/${slug}/${path})`
-  );
-  description = description.replace(
-    /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
-    (match, path) => match.replace(path, `${RAW_BASE_URL}/${slug}/${path}`)
-  );
+  const processMarkdown = (text: string) => {
+    let processed = text;
+    // Strip LaTeX-style $ symbols (as requested by previous code logic)
+    processed = processed.replace(/\$/g, "");
+
+    // Transform ![alt](path.png)
+    processed = processed.replace(
+      /!\[(.*?)\]\((?!http)(.*?)\)/g,
+      (match, alt, path) => `![${alt}](${RAW_BASE_URL}/${slug}/${path})`
+    );
+
+    // Transform <img src="path.png">
+    processed = processed.replace(
+      /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
+      (match, path) => match.replace(path, `${RAW_BASE_URL}/${slug}/${path}`)
+    );
+
+    return processed;
+  };
+
+  const explanation = processMarkdown(readmeText);
+  let description = processMarkdown(readmeText.split("---")[0] || "No description available.");
 
   return {
     slug,
@@ -152,6 +163,7 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
     difficulty: "Medium", // Could parse from README
     categories: [], // Could parse from README
     description,
+    explanation,
     complexity: {
       time: approaches[0]?.timeComplexity || "O(n)",
       space: approaches[0]?.spaceComplexity || "O(1)",
