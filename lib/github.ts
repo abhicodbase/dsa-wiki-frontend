@@ -142,13 +142,19 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
     // Transform ![alt](path.png)
     processed = processed.replace(
       /!\[(.*?)\]\((?!http)(.*?)\)/g,
-      (match, alt, path) => `![${alt}](${RAW_BASE_URL}/${slug}/${path})`
+      (match, alt, path) => {
+        const cleanPath = path.replace(/^\.\//, "");
+        return `![${alt}](${RAW_BASE_URL}/${slug}/${cleanPath})`;
+      }
     );
 
     // Transform <img src="path.png">
     processed = processed.replace(
       /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
-      (match, path) => match.replace(path, `${RAW_BASE_URL}/${slug}/${path}`)
+      (match, path) => {
+        const cleanPath = path.replace(/^\.\//, "");
+        return match.replace(path, `${RAW_BASE_URL}/${slug}/${cleanPath}`);
+      }
     );
 
     return processed;
@@ -157,16 +163,27 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   const explanation = processMarkdown(readmeText);
   let description = processMarkdown(readmeText.split("---")[0] || "No description available.");
 
+  // Metadata Extraction
+  const getMatch = (regex: RegExp) => {
+    const match = readmeText.match(regex);
+    return match ? match[1].trim() : null;
+  };
+
+  const extractedDifficulty = getMatch(/- \*\*Difficulty:\*\* (.*)/) as Difficulty | null;
+  const extractedCategories = getMatch(/- \*\*Categories:\*\* (.*)/);
+  const extractedTime = getMatch(/- \*\*Time Complexity:\*\* (.*)/);
+  const extractedSpace = getMatch(/- \*\*Space Complexity:\*\* (.*)/);
+
   return {
     slug,
     title,
-    difficulty: "Medium", // Could parse from README
-    categories: [], // Could parse from README
+    difficulty: extractedDifficulty || inferDifficulty(slug),
+    categories: extractedCategories ? extractedCategories.split(",").map(c => c.trim() as Category) : inferCategories(slug),
     description,
     explanation,
     complexity: {
-      time: approaches[0]?.timeComplexity || "O(n)",
-      space: approaches[0]?.spaceComplexity || "O(1)",
+      time: extractedTime || approaches[0]?.timeComplexity || "O(n)",
+      space: extractedSpace || approaches[0]?.spaceComplexity || "O(1)",
     },
     approaches,
     resources: [], // Could parse from README
