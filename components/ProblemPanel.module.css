@@ -18,6 +18,10 @@
     transform: translateX(0);
 }
 
+.panel.expanded {
+    width: min(100vw, calc(100vw - 40px));
+}
+
 .panelMasthead {
     border-bottom: 3px double var(--rule);
     padding: 24px 32px 18px;
@@ -66,6 +70,25 @@
     border: 1px solid var(--rule-light);
     padding: 4px 10px;
     transition: all 0.2s;
+}
+
+.expandBtn {
+    font-family: var(--body);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: var(--ink2);
+    cursor: pointer;
+    background: var(--paper3);
+    border: 1px solid var(--rule-light);
+    padding: 4px 10px;
+    transition: all 0.2s;
+}
+
+.expandBtn:hover {
+    background: var(--paper2);
+    color: var(--ink);
+    border-color: var(--ink3);
 }
 
 .closeTextBtn:hover {

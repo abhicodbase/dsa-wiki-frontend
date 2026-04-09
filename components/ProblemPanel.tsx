@@ -19,6 +19,7 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
     const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
     const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
+    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         if (problem) {
@@ -43,7 +44,7 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
     const diffClass = problem.difficulty?.toLowerCase() || 'medium';
 
     return (
-        <aside className={`${styles.panel} ${isOpen ? styles.open : ''}`}>
+        <aside className={`${styles.panel} ${isOpen ? styles.open : ''} ${isExpanded ? styles.expanded : ''}`}>
             <div className={styles.panelMasthead}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                     <div>
@@ -51,6 +52,9 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
                         <h1 className={styles.panelHeadline}>{problem.title}</h1>
                     </div>
                     <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
+                        <button className={styles.expandBtn} onClick={() => setIsExpanded(!isExpanded)}>
+                            {isExpanded ? 'REDUCE' : 'EXPAND'}
+                        </button>
                         <button className={styles.closeTextBtn} onClick={onClose}>CLOSE</button>
                         <button className={styles.panelClose} onClick={onClose}>✕</button>
                     </div>
