@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Problem } from "@/lib/github";
 import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
+import Mermaid from "@/components/Mermaid";
 import ReactMarkdown from "react-markdown";
 import styles from "./ProblemPanel.module.css";
 
@@ -109,7 +110,20 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
                                     <span className={styles.spinner}></span> Consulting GitHub...
                                 </div>
                             ) : (
-                                <ReactMarkdown>{problem.description}</ReactMarkdown>
+                                <ReactMarkdown
+                                    components={{
+                                        code({ node, className, children, ...props }) {
+                                            const match = /language-(\w+)/.exec(className || '');
+                                            const isMermaid = match && match[1] === 'mermaid';
+                                            if (isMermaid) {
+                                                return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+                                            }
+                                            return <code className={className} {...props}>{children}</code>;
+                                        }
+                                    }}
+                                >
+                                    {problem.description}
+                                </ReactMarkdown>
                             )}
                         </div>
                         {!isSkeletal && <hr className={styles.panelRule} />}
@@ -177,7 +191,20 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
                 {activeTab === 'explain' && (
                     <div id="tab-explain">
                         <div className={styles.panelBodyText}>
-                            <ReactMarkdown>{problem.explanation || "No explanation available."}</ReactMarkdown>
+                            <ReactMarkdown
+                                components={{
+                                    code({ node, className, children, ...props }) {
+                                        const match = /language-(\w+)/.exec(className || '');
+                                        const isMermaid = match && match[1] === 'mermaid';
+                                        if (isMermaid) {
+                                            return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+                                        }
+                                        return <code className={className} {...props}>{children}</code>;
+                                    }
+                                }}
+                            >
+                                {problem.explanation || "No explanation available."}
+                            </ReactMarkdown>
                         </div>
                     </div>
                 )}
