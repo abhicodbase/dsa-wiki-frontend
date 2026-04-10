@@ -1,6 +1,7 @@
 .app {
     display: flex;
-    min-height: 100vh;
+    flex: 1;
+    min-height: 0;
 }
 
 .main {
@@ -10,8 +11,11 @@
 }
 
 .panelOpen .main {
-    /* Margin-right is now handled in globals as a variable, but let's be explicit if needed */
     margin-right: var(--panel);
+}
+
+.focusMode .main {
+    margin-right: 0;
 }
 
 .hero {

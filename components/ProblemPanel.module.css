@@ -10,8 +10,9 @@
     transition: transform 0.35s ease-in-out;
     display: flex;
     flex-direction: column;
-    z-index: 90;
+    z-index: 110;
     box-shadow: -10px 0 30px rgba(0, 0, 0, 0.05);
+    transition: transform 0.35s ease-in-out, width 0.35s ease-in-out, top 0.35s ease-in-out;
 }
 
 .panel.open {
@@ -19,15 +20,13 @@
 }
 
 .panel.expanded {
-    width: min(100vw, calc(100vw - 40px));
+    width: 100vw;
 }
 
 .panelMasthead {
     border-bottom: 3px double var(--rule);
-    padding: 24px 32px 18px;
+    padding: 24px 24px 18px;
     flex-shrink: 0;
-    margin-top: 2px;
-    /* Slight buffer */
 }
 
 .panelSectionTag {
@@ -46,17 +45,42 @@
     font-weight: 900;
     line-height: 1.2;
     color: var(--ink);
+    overflow-wrap: break-word;
+    word-break: break-all;
 }
 
-.panelClose {
-    font-size: 20px;
-    color: var(--ink3);
-    cursor: pointer;
+.mastheadGroup {
+    flex: 1;
+    min-width: 0;
+    margin-right: 20px;
+}
+
+.panelActionGroup {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.panelClose,
+.expandBtn,
+.closeTextBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     background: none;
     border: none;
-    line-height: 1;
-    transition: color 0.15s;
-    padding: 0;
+    cursor: pointer;
+    padding: 6px;
+    color: var(--ink3);
+    transition: all 0.2s;
+}
+
+.panelClose:hover,
+.expandBtn:hover,
+.closeTextBtn:hover {
+    color: var(--red);
+    background: var(--paper2);
 }
 
 .closeTextBtn {
@@ -64,12 +88,8 @@
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: var(--ink3);
-    cursor: pointer;
-    background: transparent;
     border: 1px solid var(--rule-light);
     padding: 4px 10px;
-    transition: all 0.2s;
 }
 
 .expandBtn {
@@ -77,12 +97,15 @@
     font-size: 10px;
     font-weight: 700;
     letter-spacing: 0.1em;
-    color: var(--ink2);
+    color: var(--ink);
     cursor: pointer;
     background: var(--paper3);
     border: 1px solid var(--rule-light);
-    padding: 4px 10px;
+    padding: 6px 10px;
     transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 4px;
 }
 
 .expandBtn:hover {
@@ -105,6 +128,7 @@
     border-bottom: 1px solid var(--rule-light);
     flex-shrink: 0;
     padding: 0 16px;
+    background: var(--paper);
 }
 
 .ptab {
@@ -136,7 +160,8 @@
 .panelBody {
     flex: 1;
     overflow-y: auto;
-    padding: 32px;
+    padding: 32px 24px;
+    min-height: 0;
 }
 
 .panelBadges {

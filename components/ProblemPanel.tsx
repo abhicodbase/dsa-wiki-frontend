@@ -6,21 +6,23 @@ import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
 import Mermaid from "@/components/Mermaid";
 import ReactMarkdown from "react-markdown";
+import { Maximize2, Minimize2, X, PanelRightClose } from "lucide-react";
 import styles from "./ProblemPanel.module.css";
 
 interface ProblemPanelProps {
     problem: Problem | null;
     isOpen: boolean;
+    isExpanded: boolean;
+    onToggleExpand: () => void;
     onClose: () => void;
     isLoading?: boolean;
     error?: string | null;
 }
 
-export default function ProblemPanel({ problem, isOpen, onClose, error }: ProblemPanelProps) {
+export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpand, onClose, error }: ProblemPanelProps) {
     const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
     const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
-    const [isExpanded, setIsExpanded] = useState(false);
 
     useEffect(() => {
         if (problem) {
@@ -47,17 +49,26 @@ export default function ProblemPanel({ problem, isOpen, onClose, error }: Proble
     return (
         <aside className={`${styles.panel} ${isOpen ? styles.open : ''} ${isExpanded ? styles.expanded : ''}`}>
             <div className={styles.panelMasthead}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                    <div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <div className={styles.mastheadGroup}>
                         <span className={styles.panelSectionTag}>Problem · #{problem.slug.slice(0, 2)}</span>
                         <h1 className={styles.panelHeadline}>{problem.title}</h1>
                     </div>
-                    <div style={{ display: 'flex', gap: '12px', alignItems: 'center' }}>
-                        <button className={styles.expandBtn} onClick={() => setIsExpanded(!isExpanded)}>
-                            {isExpanded ? 'REDUCE' : 'EXPAND'}
+                    <div className={styles.panelActionGroup}>
+                        <button
+                            className={styles.expandBtn}
+                            onClick={onToggleExpand}
+                            title={isExpanded ? 'Reduce' : 'Expand Focus'}
+                        >
+                            {isExpanded ? <Minimize2 size={16} /> : <Maximize2 size={16} />}
                         </button>
-                        <button className={styles.closeTextBtn} onClick={onClose}>CLOSE</button>
-                        <button className={styles.panelClose} onClick={onClose}>✕</button>
+                        <button
+                            className={styles.panelClose}
+                            onClick={onClose}
+                            title="Close Panel"
+                        >
+                            <X size={18} />
+                        </button>
                     </div>
                 </div>
             </div>

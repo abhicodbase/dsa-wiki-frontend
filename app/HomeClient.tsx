@@ -15,7 +15,12 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const [progress, setProgress] = useState<ProgressMap>({});
     const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
     const [isPanelOpen, setIsPanelOpen] = useState(false);
+    const [isExpanded, setIsExpanded] = useState(false);
     const [fetchError, setFetchError] = useState<string | null>(null);
+
+    useEffect(() => {
+        if (!isPanelOpen) setIsExpanded(false);
+    }, [isPanelOpen]);
 
     useEffect(() => {
         setTopic(searchParams.get("topic") || "All Problems");
@@ -72,13 +77,15 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     };
 
     return (
-        <div className={`${styles.app} ${isPanelOpen ? styles.panelOpen : ''}`}>
+        <div className={`${styles.app} ${isPanelOpen ? styles.panelOpen : ''} ${isExpanded ? styles.focusMode : ''}`}>
             <div className={styles.main}>
                 <div style={{
                     paddingBottom: '60px',
-                    margin: isPanelOpen ? '0 32px' : '0 auto',
-                    maxWidth: isPanelOpen ? '100%' : 'var(--col)',
-                    transition: 'all 0.35s ease-in-out'
+                    margin: isPanelOpen && !isExpanded ? '0 32px' : '0 auto',
+                    maxWidth: isPanelOpen && !isExpanded ? '100%' : 'var(--col)',
+                    transition: 'all 0.35s ease-in-out',
+                    opacity: isExpanded ? 0 : 1,
+                    pointerEvents: isExpanded ? 'none' : 'auto'
                 }}>
                     {/* HERO SECTION */}
                     <section className={styles.hero}>
@@ -197,6 +204,8 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
             <ProblemPanel
                 problem={selectedProblem}
                 isOpen={isPanelOpen}
+                isExpanded={isExpanded}
+                onToggleExpand={() => setIsExpanded(!isExpanded)}
                 onClose={() => setIsPanelOpen(false)}
                 error={fetchError}
             />

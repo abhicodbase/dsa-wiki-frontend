@@ -32,8 +32,10 @@ const Mermaid = ({ chart }: MermaidProps) => {
     }, [chart]);
 
     return (
-        <div key={chart} className="mermaid" ref={ref} style={{ textAlign: 'center', marginBottom: '20px' }}>
-            {chart}
+        <div style={{ width: '100%', overflowX: 'auto', marginBottom: '24px' }}>
+            <div key={chart} className="mermaid" ref={ref} style={{ textAlign: 'center' }}>
+                {chart}
+            </div>
         </div>
     );
 };

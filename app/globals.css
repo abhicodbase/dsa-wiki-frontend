@@ -58,8 +58,18 @@ body {
   font-family: var(--body);
   font-size: 15px;
   line-height: 1.7;
-  min-height: 100vh;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
+}
+
+main {
+  flex: 1;
+  overflow-y: auto;
+  min-height: 0;
+  position: relative;
 }
 
 .container {

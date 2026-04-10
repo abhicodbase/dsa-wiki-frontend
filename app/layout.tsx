@@ -45,8 +45,10 @@ export default function RootLayout({
     <html lang="en" className={`${playfair.variable} ${libre.variable} ${sourceCode.variable} ${unifraktur.variable}`}>
       <body>
         <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <main>
+          {children}
+          <Footer />
+        </main>
       </body>
     </html>
   );
