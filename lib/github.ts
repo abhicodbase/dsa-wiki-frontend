@@ -59,14 +59,24 @@ export interface Problem {
 
 async function fetchGitHub(url: string) {
   const isDev = process.env.NODE_ENV === "development";
+  
+  const headers: Record<string, string> = {
+    Accept: "application/vnd.github.v3+json",
+  };
+  
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `token ${process.env.GITHUB_TOKEN}`;
+  }
+
   const res = await fetch(url, {
     next: { revalidate: isDev ? 0 : 300 }, // No cache in dev, 5 min in prod
-    headers: {
-      Accept: "application/vnd.github.v3+json",
-      // Authorization: `token ${process.env.GITHUB_TOKEN}`
-    },
+    headers,
   });
-  if (!res.ok) return null;
+  
+  if (!res.ok) {
+    console.error(`GitHub API entry failed for ${url}: ${res.status} ${res.statusText}`);
+    return null;
+  }
   return res.json();
 }
 
