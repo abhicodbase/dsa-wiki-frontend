@@ -260,3 +260,18 @@
 .searchInput:focus {
     border-color: var(--ink2);
 }
+
+.dtag.status {
+    background: var(--rule-light);
+    color: var(--ink2);
+}
+
+.dtag.status.active {
+    background: var(--ink);
+    color: var(--paper);
+    opacity: 1;
+}
+
+.dtag.status.off {
+    opacity: 0.4;
+}

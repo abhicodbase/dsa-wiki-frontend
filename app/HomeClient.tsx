@@ -12,6 +12,7 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const searchParams = useSearchParams();
     const [topic, setTopic] = useState(searchParams.get("topic") || "All Problems");
     const [searchQuery, setSearchQuery] = useState("");
+    const [statusFilter, setStatusFilter] = useState("All");
     const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
     const [progress, setProgress] = useState<ProgressMap>({});
     const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
@@ -49,7 +50,17 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
         ? filteredByTopic
         : filteredByTopic.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.slug.toLowerCase().includes(searchQuery.toLowerCase()));
 
-    const filtered = filteredBySearch.filter(p => !hiddenDiffs.has(p.difficulty));
+    const filteredByStatus = statusFilter === "All"
+        ? filteredBySearch
+        : filteredBySearch.filter(p => {
+            const stat = progress[p.slug] || 'none';
+            if (statusFilter === "Pending") return stat === 'none';
+            if (statusFilter === "Attempted") return stat === 'attempted';
+            if (statusFilter === "Completed") return stat === 'solved';
+            return true;
+        });
+
+    const filtered = filteredByStatus.filter(p => !hiddenDiffs.has(p.difficulty));
 
     const totalProblems = initialProblems.length;
     const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
@@ -150,6 +161,35 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                                 className={styles.searchInput}
                             />
                         </div>
+                        
+                        <span className={styles.filterLabel}>Status</span>
+                        <div className={styles.diffTags}>
+                             <button
+                                className={`${styles.dtag} ${styles.status} ${statusFilter === 'All' ? styles.active : styles.off}`}
+                                onClick={() => setStatusFilter('All')}
+                            >
+                                All
+                            </button>
+                            <button
+                                className={`${styles.dtag} ${styles.status} ${statusFilter === 'Pending' ? styles.active : styles.off}`}
+                                onClick={() => setStatusFilter('Pending')}
+                            >
+                                Pending
+                            </button>
+                            <button
+                                className={`${styles.dtag} ${styles.status} ${statusFilter === 'Attempted' ? styles.active : styles.off}`}
+                                onClick={() => setStatusFilter('Attempted')}
+                            >
+                                Attempted
+                            </button>
+                            <button
+                                className={`${styles.dtag} ${styles.status} ${statusFilter === 'Completed' ? styles.active : styles.off}`}
+                                onClick={() => setStatusFilter('Completed')}
+                            >
+                                Completed
+                            </button>
+                        </div>
+
                         <span className={styles.filterLabel}>Difficulty</span>
                         <div className={styles.diffTags}>
                             <button
