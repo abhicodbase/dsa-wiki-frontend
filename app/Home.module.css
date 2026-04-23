@@ -238,3 +238,25 @@
 .probTable th:last-child {
     text-align: right;
 }
+.searchContainer {
+    flex: 1;
+    min-width: 200px;
+}
+
+.searchInput {
+    width: 100%;
+    max-width: 300px;
+    padding: 6px 12px;
+    font-family: var(--body);
+    font-size: 13px;
+    border: 1px solid var(--rule);
+    background: var(--paper);
+    color: var(--ink);
+    border-radius: 4px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.searchInput:focus {
+    border-color: var(--ink2);
+}

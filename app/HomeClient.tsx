@@ -11,6 +11,7 @@ import styles from "./Home.module.css";
 function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const searchParams = useSearchParams();
     const [topic, setTopic] = useState(searchParams.get("topic") || "All Problems");
+    const [searchQuery, setSearchQuery] = useState("");
     const [hiddenDiffs, setHiddenDiffs] = useState<Set<string>>(new Set());
     const [progress, setProgress] = useState<ProgressMap>({});
     const [selectedProblem, setSelectedProblem] = useState<Problem | null>(null);
@@ -44,7 +45,11 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
         ? initialProblems
         : initialProblems.filter(p => p.categories.some(cat => cat.toLowerCase() === topic.toLowerCase()));
 
-    const filtered = filteredByTopic.filter(p => !hiddenDiffs.has(p.difficulty));
+    const filteredBySearch = searchQuery.trim() === ""
+        ? filteredByTopic
+        : filteredByTopic.filter(p => p.title.toLowerCase().includes(searchQuery.toLowerCase()) || p.slug.toLowerCase().includes(searchQuery.toLowerCase()));
+
+    const filtered = filteredBySearch.filter(p => !hiddenDiffs.has(p.difficulty));
 
     const totalProblems = initialProblems.length;
     const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
@@ -136,6 +141,15 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
 
                     {/* FILTER BAR */}
                     <div className={styles.filterBar}>
+                        <div className={styles.searchContainer}>
+                            <input
+                                type="text"
+                                placeholder="Search problems..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className={styles.searchInput}
+                            />
+                        </div>
                         <span className={styles.filterLabel}>Difficulty</span>
                         <div className={styles.diffTags}>
                             <button
