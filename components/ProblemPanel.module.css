@@ -355,3 +355,119 @@
         transform: rotate(360deg);
     }
 }
+
+/* ── Inline image in markdown ── */
+.imgWrapper {
+    display: block;
+    margin: 20px 0;
+    position: relative;
+    text-align: center;
+}
+
+.mdImage {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 0 auto;
+    cursor: zoom-in;
+    border: 1px solid var(--rule-light);
+    transition: opacity 0.15s, box-shadow 0.15s;
+}
+
+.mdImage:hover {
+    opacity: 0.88;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+}
+
+.imgHint {
+    display: block;
+    margin-top: 6px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink3);
+    font-family: var(--body);
+}
+
+/* ── Lightbox Overlay ── */
+.lightboxOverlay {
+    position: fixed;
+    inset: 0;
+    z-index: 9000;
+    background: rgba(10, 8, 6, 0.88);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    cursor: zoom-out;
+    animation: fadeIn 0.18s ease;
+    backdrop-filter: blur(4px);
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.lightboxContent {
+    position: relative;
+    cursor: default;
+    max-width: 90vw;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+    animation: zoomIn 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes zoomIn {
+    from { transform: scale(0.88); opacity: 0; }
+    to   { transform: scale(1);    opacity: 1; }
+}
+
+.lightboxImage {
+    max-width: 90vw;
+    max-height: 82vh;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    display: block;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 24px 80px rgba(0, 0, 0, 0.6);
+}
+
+.lightboxCaption {
+    font-family: var(--body);
+    font-size: 12px;
+    letter-spacing: 0.06em;
+    color: rgba(255, 255, 255, 0.65);
+    text-align: center;
+    max-width: 600px;
+    order: 2;
+}
+
+.lightboxClose {
+    position: fixed;
+    top: 20px;
+    right: 24px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.15s;
+    z-index: 9001;
+    border-radius: 2px;
+}
+
+.lightboxClose:hover {
+    background: rgba(139, 26, 26, 0.75);
+    border-color: rgba(139, 26, 26, 0.9);
+    transform: scale(1.08);
+}

@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Problem } from "@/lib/github";
 import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
 import Mermaid from "@/components/Mermaid";
 import ReactMarkdown from "react-markdown";
-import { Maximize2, Minimize2, X, PanelRightClose } from "lucide-react";
+import { Maximize2, Minimize2, X } from "lucide-react";
 import styles from "./ProblemPanel.module.css";
 
 interface ProblemPanelProps {
@@ -23,6 +23,8 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
     const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
     const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
+    const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
+    const [lightboxAlt, setLightboxAlt] = useState<string>('');
 
     useEffect(() => {
         if (problem) {
@@ -32,6 +34,57 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
             setActiveApproach(0);
         }
     }, [problem]);
+
+    const openLightbox = useCallback((src: string, alt: string) => {
+        setLightboxSrc(src);
+        setLightboxAlt(alt);
+    }, []);
+
+    const closeLightbox = useCallback(() => {
+        setLightboxSrc(null);
+        setLightboxAlt('');
+    }, []);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === 'Escape' && lightboxSrc) {
+                closeLightbox();
+            }
+        };
+        document.addEventListener('keydown', handleKeyDown);
+        return () => document.removeEventListener('keydown', handleKeyDown);
+    }, [lightboxSrc, closeLightbox]);
+
+    // Custom image renderer for ReactMarkdown — makes every image clickable
+    const MarkdownImage = useCallback(({ src, alt }: { src?: string; alt?: string }) => {
+        if (!src) return null;
+        return (
+            <span className={styles.imgWrapper}>
+                <img
+                    src={src}
+                    alt={alt || ''}
+                    className={styles.mdImage}
+                    onClick={() => openLightbox(src, alt || '')}
+                    title="Click to enlarge"
+                />
+                <span className={styles.imgHint}>🔍 Click to enlarge</span>
+            </span>
+        );
+    }, [openLightbox]);
+
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const markdownComponents: any = {
+        code({ node: _node, className, children, ...props }: { node?: unknown; className?: string; children?: React.ReactNode; [key: string]: unknown }) {
+            const match = /language-(\w+)/.exec(className || '');
+            const isMermaid = match && match[1] === 'mermaid';
+            if (isMermaid) {
+                return <Mermaid chart={String(children).replace(/\n$/, '')} />;
+            }
+            return <code className={className} {...(props as React.HTMLAttributes<HTMLElement>)}>{children}</code>;
+        },
+        img: MarkdownImage,
+    };
+
 
     const handleStatusChange = (status: ProblemStatus) => {
         if (problem) {
@@ -47,6 +100,36 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
     const diffClass = problem.difficulty?.toLowerCase() || 'medium';
 
     return (
+        <>
+        {/* Image Lightbox Modal */}
+        {lightboxSrc && (
+            <div
+                className={styles.lightboxOverlay}
+                onClick={closeLightbox}
+                role="dialog"
+                aria-modal="true"
+                aria-label={`Full size image: ${lightboxAlt}`}
+            >
+                <div className={styles.lightboxContent} onClick={(e) => e.stopPropagation()}>
+                    <button
+                        className={styles.lightboxClose}
+                        onClick={closeLightbox}
+                        title="Close (Esc)"
+                        aria-label="Close image viewer"
+                    >
+                        <X size={20} />
+                    </button>
+                    {lightboxAlt && (
+                        <p className={styles.lightboxCaption}>{lightboxAlt}</p>
+                    )}
+                    <img
+                        src={lightboxSrc}
+                        alt={lightboxAlt}
+                        className={styles.lightboxImage}
+                    />
+                </div>
+            </div>
+        )}
         <aside className={`${styles.panel} ${isOpen ? styles.open : ''} ${isExpanded ? styles.expanded : ''}`}>
             <div className={styles.panelMasthead}>
                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
@@ -121,18 +204,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                     <span className={styles.spinner}></span> Consulting GitHub...
                                 </div>
                             ) : (
-                                <ReactMarkdown
-                                    components={{
-                                        code({ node, className, children, ...props }) {
-                                            const match = /language-(\w+)/.exec(className || '');
-                                            const isMermaid = match && match[1] === 'mermaid';
-                                            if (isMermaid) {
-                                                return <Mermaid chart={String(children).replace(/\n$/, '')} />;
-                                            }
-                                            return <code className={className} {...props}>{children}</code>;
-                                        }
-                                    }}
-                                >
+                                <ReactMarkdown components={markdownComponents}>
                                     {problem.description}
                                 </ReactMarkdown>
                             )}
@@ -202,18 +274,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                 {activeTab === 'explain' && (
                     <div id="tab-explain">
                         <div className={styles.panelBodyText}>
-                            <ReactMarkdown
-                                components={{
-                                    code({ node, className, children, ...props }) {
-                                        const match = /language-(\w+)/.exec(className || '');
-                                        const isMermaid = match && match[1] === 'mermaid';
-                                        if (isMermaid) {
-                                            return <Mermaid chart={String(children).replace(/\n$/, '')} />;
-                                        }
-                                        return <code className={className} {...props}>{children}</code>;
-                                    }
-                                }}
-                            >
+                            <ReactMarkdown components={markdownComponents}>
                                 {problem.explanation || "No explanation available."}
                             </ReactMarkdown>
                         </div>
@@ -230,5 +291,6 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                 )}
             </div>
         </aside>
+        </>
     );
 }
