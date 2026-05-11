@@ -65,6 +65,11 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const totalProblems = initialProblems.length;
     const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
     const inProgressCount = Object.values(progress).filter(s => s === 'attempted').length;
+    const pendingCount = totalProblems - solvedCount - inProgressCount;
+
+    const solvedPct    = totalProblems > 0 ? (solvedCount / totalProblems) * 100 : 0;
+    const attemptedPct = totalProblems > 0 ? (inProgressCount / totalProblems) * 100 : 0;
+    const pendingPct   = totalProblems > 0 ? (pendingCount / totalProblems) * 100 : 100;
 
     useEffect(() => {
         if (selectedProblem && (!selectedProblem.approaches || selectedProblem.approaches.length === 0)) {
@@ -139,11 +144,43 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                                 </div>
                                 <div className={styles.progressSection}>
                                     <div className={styles.progressLabelRow}>
-                                        <span>Progress</span>
-                                        <span>{solvedCount} of {totalProblems}</span>
+                                        <span className={styles.progressTitle}>Progress</span>
+                                        <span className={styles.progressFraction}>{solvedCount} / {totalProblems} solved</span>
                                     </div>
+
+                                    {/* Segmented bar */}
                                     <div className={styles.progressTrack}>
-                                        <div className={styles.progressFill} style={{ width: `${(solvedCount / totalProblems) * 100}%` }}></div>
+                                        <div
+                                            className={`${styles.progressSegment} ${styles.segSolved}`}
+                                            style={{ width: `${solvedPct}%` }}
+                                            title={`Completed: ${solvedCount}`}
+                                        />
+                                        <div
+                                            className={`${styles.progressSegment} ${styles.segAttempted}`}
+                                            style={{ width: `${attemptedPct}%` }}
+                                            title={`In Progress: ${inProgressCount}`}
+                                        />
+                                        <div
+                                            className={`${styles.progressSegment} ${styles.segPending}`}
+                                            style={{ width: `${pendingPct}%` }}
+                                            title={`Pending: ${pendingCount}`}
+                                        />
+                                    </div>
+
+                                    {/* Legend */}
+                                    <div className={styles.progressLegend}>
+                                        <span className={styles.legendItem}>
+                                            <span className={`${styles.legendDot} ${styles.dotSolved}`} />
+                                            Completed <strong>{solvedCount}</strong>
+                                        </span>
+                                        <span className={styles.legendItem}>
+                                            <span className={`${styles.legendDot} ${styles.dotAttempted}`} />
+                                            In Progress <strong>{inProgressCount}</strong>
+                                        </span>
+                                        <span className={styles.legendItem}>
+                                            <span className={`${styles.legendDot} ${styles.dotPending}`} />
+                                            Pending <strong>{pendingCount}</strong>
+                                        </span>
                                     </div>
                                 </div>
                             </div>

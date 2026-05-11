@@ -109,27 +109,102 @@
     padding: 0 0 60px;
 }
 
+/* ── Progress Bar ── */
 .progressSection {
-    margin-top: 12px;
+    margin-top: 14px;
 }
 
 .progressLabelRow {
     display: flex;
     justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 6px;
+}
+
+.progressTitle {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--ink3);
+}
+
+.progressFraction {
     font-size: 11px;
     color: var(--ink3);
-    margin-bottom: 4px;
+    font-family: var(--mono);
 }
 
+/* Segmented bar container */
 .progressTrack {
-    height: 2px;
-    background: var(--rule-light);
+    height: 8px;
+    background: transparent;
+    display: flex;
+    overflow: hidden;
+    border-radius: 1px;
+    border: 0.5px solid var(--rule-light);
+    gap: 1px;
 }
 
-.progressFill {
+/* Individual segment */
+.progressSegment {
     height: 100%;
-    background: var(--red);
-    transition: width 0.4s ease;
+    transition: width 0.5s ease;
+    flex-shrink: 0;
+}
+
+.segSolved {
+    background: #276749;
+}
+
+.segAttempted {
+    background: #b8860b;
+}
+
+.segPending {
+    background: var(--paper3);
+    flex: 1; /* takes remaining space */
+}
+
+/* Legend */
+.progressLegend {
+    display: flex;
+    gap: 14px;
+    margin-top: 8px;
+    flex-wrap: wrap;
+}
+
+.legendItem {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 11px;
+    color: var(--ink3);
+}
+
+.legendItem strong {
+    color: var(--ink2);
+    font-weight: 700;
+}
+
+.legendDot {
+    width: 8px;
+    height: 8px;
+    border-radius: 1px;
+    flex-shrink: 0;
+}
+
+.dotSolved {
+    background: #276749;
+}
+
+.dotAttempted {
+    background: #b8860b;
+}
+
+.dotPending {
+    background: var(--paper3);
+    border: 0.5px solid var(--rule-light);
 }
 
 .filterBar {
