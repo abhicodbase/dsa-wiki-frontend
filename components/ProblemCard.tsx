@@ -25,6 +25,7 @@ export default function ProblemCard({ problem, index, status, isSelected, onSele
         <span className={`${styles.checkCircle} ${status !== 'none' ? styles[status] : ''}`}>
           {status === 'solved' && '✓'}
           {status === 'attempted' && '·'}
+          {status === 'blocker' && '!'}
         </span>
       </td>
       <td className={styles.probTitleCell}>

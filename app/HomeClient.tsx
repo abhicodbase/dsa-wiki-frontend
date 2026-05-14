@@ -57,6 +57,7 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
             if (statusFilter === "Pending") return stat === 'none';
             if (statusFilter === "Attempted") return stat === 'attempted';
             if (statusFilter === "Completed") return stat === 'solved';
+            if (statusFilter === "Blocker") return stat === 'blocker';
             return true;
         });
 
@@ -65,11 +66,13 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
     const totalProblems = initialProblems.length;
     const solvedCount = Object.values(progress).filter(s => s === 'solved').length;
     const inProgressCount = Object.values(progress).filter(s => s === 'attempted').length;
-    const pendingCount = totalProblems - solvedCount - inProgressCount;
+    const blockerCount = Object.values(progress).filter(s => s === 'blocker').length;
+    const pendingCount = totalProblems - solvedCount - inProgressCount - blockerCount;
 
     const solvedPct    = totalProblems > 0 ? (solvedCount / totalProblems) * 100 : 0;
     const attemptedPct = totalProblems > 0 ? (inProgressCount / totalProblems) * 100 : 0;
-    const pendingPct   = totalProblems > 0 ? (pendingCount / totalProblems) * 100 : 100;
+    const blockerPct   = totalProblems > 0 ? (blockerCount / totalProblems) * 100 : 0;
+    const pendingPct   = totalProblems > 0 ? (Math.max(0, pendingCount) / totalProblems) * 100 : 100;
 
     useEffect(() => {
         if (selectedProblem && (!selectedProblem.approaches || selectedProblem.approaches.length === 0)) {
@@ -161,6 +164,11 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                                             title={`In Progress: ${inProgressCount}`}
                                         />
                                         <div
+                                            className={`${styles.progressSegment} ${styles.segBlocker}`}
+                                            style={{ width: `${blockerPct}%` }}
+                                            title={`Blocker: ${blockerCount}`}
+                                        />
+                                        <div
                                             className={`${styles.progressSegment} ${styles.segPending}`}
                                             style={{ width: `${pendingPct}%` }}
                                             title={`Pending: ${pendingCount}`}
@@ -176,6 +184,10 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                                         <span className={styles.legendItem}>
                                             <span className={`${styles.legendDot} ${styles.dotAttempted}`} />
                                             In Progress <strong>{inProgressCount}</strong>
+                                        </span>
+                                        <span className={styles.legendItem}>
+                                            <span className={`${styles.legendDot} ${styles.dotBlocker}`} />
+                                            Blocker <strong>{blockerCount}</strong>
                                         </span>
                                         <span className={styles.legendItem}>
                                             <span className={`${styles.legendDot} ${styles.dotPending}`} />
@@ -218,6 +230,12 @@ function HomeContent({ initialProblems }: { initialProblems: Problem[] }) {
                                 onClick={() => setStatusFilter('Attempted')}
                             >
                                 Attempted
+                            </button>
+                            <button
+                                className={`${styles.dtag} ${styles.status} ${statusFilter === 'Blocker' ? styles.active : styles.off}`}
+                                onClick={() => setStatusFilter('Blocker')}
+                            >
+                                Blocker
                             </button>
                             <button
                                 className={`${styles.dtag} ${styles.status} ${statusFilter === 'Completed' ? styles.active : styles.off}`}

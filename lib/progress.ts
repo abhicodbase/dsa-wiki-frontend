@@ -1,4 +1,4 @@
-export type ProblemStatus = 'solved' | 'attempted' | 'none';
+export type ProblemStatus = 'solved' | 'attempted' | 'blocker' | 'none';
 
 export interface ProgressMap {
     [slug: string]: ProblemStatus;

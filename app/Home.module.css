@@ -161,6 +161,10 @@
     background: #b8860b;
 }
 
+.segBlocker {
+    background: #c53030;
+}
+
 .segPending {
     background: var(--paper3);
     flex: 1; /* takes remaining space */
@@ -200,6 +204,10 @@
 
 .dotAttempted {
     background: #b8860b;
+}
+
+.dotBlocker {
+    background: #c53030;
 }
 
 .dotPending {

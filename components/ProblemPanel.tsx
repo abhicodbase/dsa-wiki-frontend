@@ -229,6 +229,12 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                 - Attempted
                             </button>
                             <button
+                                className={`${styles.sbtn} ${problemStatus === 'blocker' ? styles.sbtnBlocker : ''}`}
+                                onClick={() => handleStatusChange('blocker')}
+                            >
+                                ! Blocker
+                            </button>
+                            <button
                                 className={styles.sbtn}
                                 onClick={() => handleStatusChange('none')}
                             >

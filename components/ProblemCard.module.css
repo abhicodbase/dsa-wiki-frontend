@@ -56,6 +56,14 @@
     opacity: 1;
 }
 
+.checkCircle.blocker {
+    background: #fff5f5;
+    color: #c53030;
+    border-color: #c53030;
+    opacity: 1;
+    font-weight: 900;
+}
+
 .probTitleCell {
     padding: 14px 10px;
     vertical-align: middle;

@@ -257,6 +257,12 @@
     border-color: var(--warning-text) !important;
 }
 
+.sbtnBlocker {
+    background: #fff5f5 !important;
+    color: #c53030 !important;
+    border-color: #c53030 !important;
+}
+
 .explainLede {
     text-align: center;
     padding: 32px 24px;
