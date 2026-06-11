@@ -331,7 +331,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                         </body>
                                     </html>
                                 `}
-                                style={{ width: '100%', height: '420px', border: 'none' }}
+                                style={{ width: '100%', height: '560px', border: 'none' }}
                                 sandbox="allow-scripts"
                                 title={problem.demos[activeDemoIndex].name}
                             />
