@@ -56,6 +56,7 @@ export interface Problem {
   resources: Resource[];
   visualImage?: string;
   explanation: string;
+  demos?: { name: string; code: string }[];
 }
 
 async function fetchGitHub(url: string) {
@@ -116,7 +117,8 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   if (!contents || !Array.isArray(contents)) return null;
 
   const readme = contents.find((f: any) => f.name.toLowerCase() === "readme.md");
-  const solutionFiles = contents.filter((f: any) => f.name.endsWith(".cpp") || f.name.endsWith(".html"));
+  const cppFiles = contents.filter((f: any) => f.name.endsWith(".cpp"));
+  const htmlFiles = contents.filter((f: any) => f.name.endsWith(".html"));
   const conceptImg = contents.find((f: any) => f.name === "concept.png");
 
   let readmeText = "";
@@ -126,12 +128,11 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   }
 
   const approaches: Approach[] = await Promise.all(
-    solutionFiles.map(async (file: any) => {
+    cppFiles.map(async (file: any) => {
       const res = await fetch(file.download_url);
       const code = await res.text();
-      const isHtml = file.name.endsWith(".html");
       const name = file.name
-        .replace(/\.(cpp|html)$/, "")
+        .replace(/\.cpp$/, "")
         .split("_")
         .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
         .join(" ");
@@ -141,8 +142,21 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
         code,
         timeComplexity: "O(? )",
         spaceComplexity: "O(? )",
-        language: isHtml ? "html" : "cpp",
+        language: "cpp",
       };
+    })
+  );
+
+  const demos = await Promise.all(
+    htmlFiles.map(async (file: any) => {
+      const res = await fetch(file.download_url);
+      const code = await res.text();
+      const name = file.name
+        .replace(/\.html$/, "")
+        .split("_")
+        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
+      return { name, code };
     })
   );
 
@@ -204,6 +218,7 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
       space: extractedSpace || approaches[0]?.spaceComplexity || "O(1)",
     },
     approaches,
+    demos,
     resources: [], // Could parse from README
     visualImage: conceptImg ? `${RAW_BASE_URL}/${slug}/concept.png` : undefined,
   };

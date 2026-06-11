@@ -20,8 +20,9 @@ interface ProblemPanelProps {
 }
 
 export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpand, onClose, error }: ProblemPanelProps) {
-    const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes'>('problem');
+    const [activeTab, setActiveTab] = useState<'problem' | 'solution' | 'explain' | 'notes' | 'demo'>('problem');
     const [activeApproach, setActiveApproach] = useState(0);
+    const [activeDemoIndex, setActiveDemoIndex] = useState(0);
     const [problemStatus, setProblemStatus] = useState<ProblemStatus>('none');
     const [lightboxSrc, setLightboxSrc] = useState<string | null>(null);
     const [lightboxAlt, setLightboxAlt] = useState<string>('');
@@ -32,6 +33,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
             setProblemStatus(progress[problem.slug] || 'none');
             setActiveTab('problem');
             setActiveApproach(0);
+            setActiveDemoIndex(0);
         }
     }, [problem]);
 
@@ -169,6 +171,14 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                 >
                     Solution
                 </button>
+                {problem.demos && problem.demos.length > 0 && (
+                    <button
+                        className={`${styles.ptab} ${activeTab === 'demo' ? styles.ptabActive : ''}`}
+                        onClick={() => setActiveTab('demo')}
+                    >
+                        Interactive Demo
+                    </button>
+                )}
                 <button
                     className={`${styles.ptab} ${activeTab === 'explain' ? styles.ptabActive : ''}`}
                     onClick={() => setActiveTab('explain')}
@@ -272,6 +282,59 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                     <CodeViewer code={approach?.code || ''} language={approach?.language} />
                                 </>
                             )}
+                        </div>
+                    </div>
+                )}
+                {/* INTERACTIVE DEMO TAB */}
+                {activeTab === 'demo' && problem.demos && problem.demos.length > 0 && (
+                    <div id="tab-demo">
+                        {problem.demos.length > 1 && (
+                            <div style={{ marginBottom: '20px', display: 'flex', gap: '8px', borderBottom: '1px solid var(--rule-light)' }}>
+                                {problem.demos.map((d, i) => (
+                                    <button
+                                        key={i}
+                                        className={`${styles.ptab} ${activeDemoIndex === i ? styles.ptabActive : ""}`}
+                                        onClick={() => setActiveDemoIndex(i)}
+                                        style={{ flex: 'none', padding: '8px 16px' }}
+                                    >
+                                        {d.name}
+                                    </button>
+                                ))}
+                            </div>
+                        )}
+                        <div style={{ width: '100%', border: '1px solid var(--rule-light)', borderRadius: '6px', overflow: 'hidden', background: '#fff' }}>
+                            <iframe
+                                srcDoc={`
+                                    <!DOCTYPE html>
+                                    <html>
+                                        <head>
+                                            <style>
+                                                :root {
+                                                    --color-border-secondary: rgba(15, 14, 12, 0.12);
+                                                    --color-text-primary: #0f0e0c;
+                                                    --color-background-secondary: #ede8dc;
+                                                    --color-text-secondary: #3a3730;
+                                                    --color-border-tertiary: rgba(15, 14, 12, 0.12);
+                                                    --border-radius-md: 4px;
+                                                }
+                                                body {
+                                                    margin: 0;
+                                                    padding: 10px;
+                                                    background: transparent;
+                                                    color: #0f0e0c;
+                                                    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+                                                }
+                                            </style>
+                                        </head>
+                                        <body>
+                                            ${problem.demos[activeDemoIndex].code}
+                                        </body>
+                                    </html>
+                                `}
+                                style={{ width: '100%', height: '420px', border: 'none' }}
+                                sandbox="allow-scripts"
+                                title={problem.demos[activeDemoIndex].name}
+                            />
                         </div>
                     </div>
                 )}
