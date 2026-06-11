@@ -133,8 +133,8 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                                 </div>
                             )}
                             <div className={styles.panelBodyText}>
-                                <p style={{ marginBottom: '14px' }}>{approach?.description || (approach?.language === 'html' ? 'Optimal solution implementation in HTML.' : 'Optimal solution implementation in C++.')}</p>
-                                <CodeViewer code={approach?.code || ''} language={approach?.language} />
+                                <p style={{ marginBottom: '14px' }}>{approach?.description || 'Optimal solution implementation in C++.'}</p>
+                                <CodeViewer code={approach?.code || ''} />
                             </div>
                         </div>
                     )}

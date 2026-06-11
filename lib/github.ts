@@ -34,7 +34,6 @@ export interface Approach {
   code: string;
   timeComplexity: string;
   spaceComplexity: string;
-  language?: string;
 }
 
 export interface Resource {
@@ -214,7 +213,6 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
               code,
               timeComplexity: "O(? )",
               spaceComplexity: "O(? )",
-              language: "cpp",
             };
           });
 
@@ -318,7 +316,6 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
         code,
         timeComplexity: "O(? )",
         spaceComplexity: "O(? )",
-        language: "cpp",
       };
     })
   );

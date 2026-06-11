@@ -8,10 +8,9 @@ import styles from "./CodeViewer.module.css";
 
 interface Props {
     code: string;
-    language?: string;
 }
 
-export default function CodeViewer({ code, language = "cpp" }: Props) {
+export default function CodeViewer({ code }: Props) {
     const [copied, setCopied] = useState(false);
 
     const handleCopy = () => {
@@ -20,19 +19,10 @@ export default function CodeViewer({ code, language = "cpp" }: Props) {
         setTimeout(() => setCopied(false), 2000);
     };
 
-    const displayLang = (() => {
-        if (language === "cpp") return "C++";
-        if (language === "html") return "HTML";
-        if (language === "javascript") return "JavaScript";
-        if (language === "typescript") return "TypeScript";
-        if (language === "python") return "Python";
-        return language.toUpperCase();
-    })();
-
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>
-                <span className={styles.lang}>{displayLang}</span>
+                <span className={styles.lang}>C++</span>
                 <button
                     className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ""}`}
                     onClick={handleCopy}
@@ -42,7 +32,7 @@ export default function CodeViewer({ code, language = "cpp" }: Props) {
                 </button>
             </div>
             <SyntaxHighlighter
-                language={language}
+                language="cpp"
                 style={vscDarkPlus}
                 customStyle={{
                     margin: 0,
