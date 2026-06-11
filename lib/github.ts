@@ -59,6 +59,28 @@ export interface Problem {
   demos?: { name: string; code: string }[];
 }
 
+// Dynamically load Node's fs and path modules on the server side
+let fs: any;
+let path: any;
+if (typeof window === "undefined") {
+  fs = require(/*turbopackIgnore: true*/ "fs");
+  path = require(/*turbopackIgnore: true*/ "path");
+}
+
+// Check if dsa-wiki repository directory exists locally next to frontend
+function getLocalRepoPath(): string | null {
+  if (typeof window !== "undefined" || !fs || !path) return null;
+  try {
+    const localPath = path.resolve(/*turbopackIgnore: true*/ process.cwd(), "../dsa-wiki");
+    if (fs.existsSync(localPath)) {
+      return localPath;
+    }
+  } catch (e) {
+    console.error("Error checking local repository path", e);
+  }
+  return null;
+}
+
 async function fetchGitHub(url: string) {
   const isDev = process.env.NODE_ENV === "development";
   
@@ -83,6 +105,40 @@ async function fetchGitHub(url: string) {
 }
 
 export async function fetchProblems(): Promise<Problem[]> {
+  // Server-side: Try to read problems from the local filesystem
+  if (typeof window === "undefined") {
+    const localRepo = getLocalRepoPath();
+    if (localRepo && fs) {
+      try {
+        const items = fs.readdirSync(localRepo, { withFileTypes: true });
+        const problemFolders = items.filter(
+          (item: any) => item.isDirectory() && item.name !== "frontend" && !item.name.startsWith(".")
+        );
+
+        return problemFolders.map((folder: any) => {
+          const slug = folder.name;
+          return {
+            slug,
+            title: slug
+              .split("-")
+              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(" "),
+            difficulty: inferDifficulty(slug),
+            categories: inferCategories(slug),
+            description: "",
+            complexity: { time: "O(n)", space: "O(1)" },
+            approaches: [],
+            resources: [],
+            explanation: "",
+          };
+        });
+      } catch (e) {
+        console.error("Failed to read problems from local disk, falling back to GitHub API", e);
+      }
+    }
+  }
+
+  // Fallback to GitHub API
   const contents = await fetchGitHub(BASE_URL);
   if (!contents || !Array.isArray(contents)) return [];
 
@@ -112,6 +168,126 @@ export async function fetchProblems(): Promise<Problem[]> {
 }
 
 export async function fetchProblemDetails(slug: string): Promise<Problem | null> {
+  // Client-side: Fetch details from our Next.js server API endpoint to bypass rate limits
+  if (typeof window !== "undefined") {
+    try {
+      const res = await fetch(`/api/problem/${slug}`);
+      if (res.ok) {
+        return await res.json();
+      }
+      console.error(`Failed to fetch problem details from API route: ${res.status}`);
+      return null;
+    } catch (e) {
+      console.error("Error fetching problem details from API route", e);
+      return null;
+    }
+  }
+
+  // Server-side: Try to read problem details from the local filesystem
+  if (typeof window === "undefined") {
+    const localRepo = getLocalRepoPath();
+    if (localRepo && fs && path) {
+      try {
+        const problemPath = path.join(localRepo, slug);
+        if (fs.existsSync(problemPath)) {
+          const items = fs.readdirSync(problemPath, { withFileTypes: true });
+          const readmeFile = items.find((f: any) => f.isFile() && f.name.toLowerCase() === "readme.md");
+          const cppFiles = items.filter((f: any) => f.isFile() && f.name.endsWith(".cpp"));
+          const htmlFiles = items.filter((f: any) => f.isFile() && f.name.endsWith(".html"));
+          const conceptImg = items.find((f: any) => f.isFile() && f.name === "concept.png");
+
+          let readmeText = "";
+          if (readmeFile) {
+            readmeText = fs.readFileSync(path.join(problemPath, readmeFile.name), "utf-8");
+          }
+
+          const approaches = cppFiles.map((file: any) => {
+            const code = fs.readFileSync(path.join(problemPath, file.name), "utf-8");
+            const name = file.name
+              .replace(/\.cpp$/, "")
+              .split("_")
+              .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ");
+            return {
+              name,
+              description: `Implementation from ${file.name}`,
+              code,
+              timeComplexity: "O(? )",
+              spaceComplexity: "O(? )",
+              language: "cpp",
+            };
+          });
+
+          const demos = htmlFiles.map((file: any) => {
+            const code = fs.readFileSync(path.join(problemPath, file.name), "utf-8");
+            const name = file.name
+              .replace(/\.html$/, "")
+              .split("_")
+              .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+              .join(" ");
+            return { name, code };
+          });
+
+          const titleMatch = readmeText.match(/# (.*)/);
+          const title = titleMatch ? titleMatch[1].replace(" - Explanation", "") : slug;
+
+          const processMarkdown = (text: string) => {
+            let processed = text;
+            processed = processed.replace(/\$/g, "");
+            processed = processed.replace(
+              /!\[(.*?)\]\((?!http)(.*?)\)/g,
+              (match, alt, imagePath) => {
+                const cleanPath = imagePath.replace(/^\.\//, "");
+                return `![${alt}](${RAW_BASE_URL}/${slug}/${cleanPath})`;
+              }
+            );
+            processed = processed.replace(
+              /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
+              (match, imagePath) => {
+                const cleanPath = imagePath.replace(/^\.\//, "");
+                return match.replace(imagePath, `${RAW_BASE_URL}/${slug}/${cleanPath}`);
+              }
+            );
+            return processed;
+          };
+
+          const explanation = processMarkdown(readmeText);
+          const description = processMarkdown(readmeText.split("---")[0] || "No description available.");
+
+          const getMatch = (regex: RegExp) => {
+            const match = readmeText.match(regex);
+            return match ? match[1].trim() : null;
+          };
+
+          const extractedDifficulty = getMatch(/- \*\*Difficulty:\*\* (.*)/) as Difficulty | null;
+          const extractedCategories = getMatch(/- \*\*Categories:\*\* (.*)/);
+          const extractedTime = getMatch(/- \*\*Time Complexity:\*\* (.*)/);
+          const extractedSpace = getMatch(/- \*\*Space Complexity:\*\* (.*)/);
+
+          return {
+            slug,
+            title,
+            difficulty: extractedDifficulty || inferDifficulty(slug),
+            categories: extractedCategories ? extractedCategories.split(",").map((c: string) => c.trim() as Category) : inferCategories(slug),
+            description,
+            explanation,
+            complexity: {
+              time: extractedTime || approaches[0]?.timeComplexity || "O(n)",
+              space: extractedSpace || approaches[0]?.spaceComplexity || "O(1)",
+            },
+            approaches,
+            demos,
+            resources: [],
+            visualImage: conceptImg ? `${RAW_BASE_URL}/${slug}/concept.png` : undefined,
+          };
+        }
+      } catch (e) {
+        console.error("Failed to read problem details from local disk, falling back to GitHub API", e);
+      }
+    }
+  }
+
+  // Fallback to GitHub API (runs in SSR / server route when local repo isn't available)
   const folderUrl = `${BASE_URL}/${slug}`;
   const contents = await fetchGitHub(folderUrl);
   if (!contents || !Array.isArray(contents)) return null;
@@ -165,13 +341,10 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   const title = titleMatch ? titleMatch[1].replace(" - Explanation", "") : slug;
 
   // Transform relative image paths to absolute GitHub RAW URLs
-  // Matches ![alt](path.png) or <img src="path.png">
   const processMarkdown = (text: string) => {
     let processed = text;
-    // Strip LaTeX-style $ symbols (as requested by previous code logic)
     processed = processed.replace(/\$/g, "");
 
-    // Transform ![alt](path.png)
     processed = processed.replace(
       /!\[(.*?)\]\((?!http)(.*?)\)/g,
       (match, alt, path) => {
@@ -180,7 +353,6 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
       }
     );
 
-    // Transform <img src="path.png">
     processed = processed.replace(
       /<img\s+[^>]*src=["'](?!http)([^"']+)["'][^>]*>/g,
       (match, path) => {
