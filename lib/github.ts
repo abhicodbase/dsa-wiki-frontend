@@ -34,6 +34,7 @@ export interface Approach {
   code: string;
   timeComplexity: string;
   spaceComplexity: string;
+  language?: string;
 }
 
 export interface Resource {
@@ -115,7 +116,7 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   if (!contents || !Array.isArray(contents)) return null;
 
   const readme = contents.find((f: any) => f.name.toLowerCase() === "readme.md");
-  const cppFiles = contents.filter((f: any) => f.name.endsWith(".cpp"));
+  const solutionFiles = contents.filter((f: any) => f.name.endsWith(".cpp") || f.name.endsWith(".html"));
   const conceptImg = contents.find((f: any) => f.name === "concept.png");
 
   let readmeText = "";
@@ -125,15 +126,22 @@ export async function fetchProblemDetails(slug: string): Promise<Problem | null>
   }
 
   const approaches: Approach[] = await Promise.all(
-    cppFiles.map(async (file: any) => {
+    solutionFiles.map(async (file: any) => {
       const res = await fetch(file.download_url);
       const code = await res.text();
+      const isHtml = file.name.endsWith(".html");
+      const name = file.name
+        .replace(/\.(cpp|html)$/, "")
+        .split("_")
+        .map((w: string) => w.charAt(0).toUpperCase() + w.slice(1))
+        .join(" ");
       return {
-        name: file.name.replace(".cpp", "").split("_").map((w: string) => w.charAt(0).toUpperCase() + w.slice(1)).join(" "),
+        name,
         description: `Implementation from ${file.name}`,
         code,
         timeComplexity: "O(? )",
         spaceComplexity: "O(? )",
+        language: isHtml ? "html" : "cpp",
       };
     })
   );

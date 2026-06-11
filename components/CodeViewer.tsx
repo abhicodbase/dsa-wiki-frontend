@@ -20,10 +20,19 @@ export default function CodeViewer({ code, language = "cpp" }: Props) {
         setTimeout(() => setCopied(false), 2000);
     };
 
+    const displayLang = (() => {
+        if (language === "cpp") return "C++";
+        if (language === "html") return "HTML";
+        if (language === "javascript") return "JavaScript";
+        if (language === "typescript") return "TypeScript";
+        if (language === "python") return "Python";
+        return language.toUpperCase();
+    })();
+
     return (
         <div className={styles.wrapper}>
             <div className={styles.header}>
-                <span className={styles.lang}>C++</span>
+                <span className={styles.lang}>{displayLang}</span>
                 <button
                     className={`${styles.copyBtn} ${copied ? styles.copiedBtn : ""}`}
                     onClick={handleCopy}
