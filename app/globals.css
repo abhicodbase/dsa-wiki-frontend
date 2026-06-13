@@ -162,7 +162,7 @@ tr:last-child td {
   border-bottom: 2px solid var(--rule);
 }
 
-code {
+:not(pre) > code {
   font-family: var(--mono);
   font-size: 12.5px;
   background-color: var(--paper2);
