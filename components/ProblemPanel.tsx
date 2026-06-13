@@ -6,6 +6,7 @@ import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
 import Mermaid from "@/components/Mermaid";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import { Maximize2, Minimize2, X } from "lucide-react";
 import styles from "./ProblemPanel.module.css";
 
@@ -214,7 +215,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                     <span className={styles.spinner}></span> Consulting GitHub...
                                 </div>
                             ) : (
-                                <ReactMarkdown components={markdownComponents}>
+                                <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                                     {problem.description}
                                 </ReactMarkdown>
                             )}
@@ -343,7 +344,7 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                 {activeTab === 'explain' && (
                     <div id="tab-explain">
                         <div className={styles.panelBodyText}>
-                            <ReactMarkdown components={markdownComponents}>
+                            <ReactMarkdown components={markdownComponents} remarkPlugins={[remarkGfm]}>
                                 {problem.explanation || "No explanation available."}
                             </ReactMarkdown>
                         </div>

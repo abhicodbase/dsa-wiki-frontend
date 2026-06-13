@@ -5,6 +5,7 @@ import { Problem } from "@/lib/github";
 import { getProgress, updateProgress, ProblemStatus } from "@/lib/progress";
 import CodeViewer from "@/components/CodeViewer";
 import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 import styles from "./Problem.module.css";
 
 export default function ProblemClient({ problem }: { problem: Problem }) {
@@ -84,7 +85,7 @@ export default function ProblemClient({ problem }: { problem: Problem }) {
                             </div>
                             <span className={styles.colKicker}>Description</span>
                             <div className={styles.panelBodyText}>
-                                <ReactMarkdown>{problem.description}</ReactMarkdown>
+                                <ReactMarkdown remarkPlugins={[remarkGfm]}>{problem.description}</ReactMarkdown>
                             </div>
                             <hr className={styles.panelRule} />
                             <span className={styles.colKicker}>Difficulty Context</span>
