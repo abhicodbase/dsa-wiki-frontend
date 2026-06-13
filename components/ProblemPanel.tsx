@@ -100,6 +100,9 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
 
     const isSkeletal = !problem.description || (problem.approaches && problem.approaches.length === 0);
     const approach = problem.approaches?.[activeApproach];
+    const currentDemo = problem.demos && problem.demos.length > 0
+        ? (problem.demos[activeDemoIndex] || problem.demos[0])
+        : null;
     const diffClass = problem.difficulty?.toLowerCase() || 'medium';
 
     return (
@@ -328,13 +331,13 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                             </style>
                                         </head>
                                         <body>
-                                            ${problem.demos[activeDemoIndex].code}
+                                            ${currentDemo ? currentDemo.code : ""}
                                         </body>
                                     </html>
                                 `}
                                 style={{ width: '100%', height: '560px', border: 'none' }}
-                                sandbox="allow-scripts"
-                                title={problem.demos[activeDemoIndex].name}
+                                sandbox="allow-scripts allow-same-origin"
+                                title={currentDemo ? currentDemo.name : "Interactive Demo"}
                             />
                         </div>
                     </div>
