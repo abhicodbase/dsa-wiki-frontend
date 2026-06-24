@@ -314,10 +314,18 @@ export default function ProblemPanel({ problem, isOpen, isExpanded, onToggleExpa
                                         <head>
                                             <style>
                                                 :root {
-                                                    --color-border-secondary: rgba(15, 14, 12, 0.12);
-                                                    --color-text-primary: #0f0e0c;
+                                                    --color-background-primary: #ffffff;
                                                     --color-background-secondary: #ede8dc;
+                                                    --color-background-success: #eaf3de;
+                                                    --color-background-danger: #fee2e2;
+                                                    --color-background-info: #e0f2fe;
+                                                    --color-text-primary: #0f0e0c;
                                                     --color-text-secondary: #3a3730;
+                                                    --color-text-tertiary: #7a7570;
+                                                    --color-text-success: #276749;
+                                                    --color-text-danger: #991b1b;
+                                                    --color-text-info: #0369a1;
+                                                    --color-border-secondary: rgba(15, 14, 12, 0.12);
                                                     --color-border-tertiary: rgba(15, 14, 12, 0.12);
                                                     --border-radius-md: 4px;
                                                 }
